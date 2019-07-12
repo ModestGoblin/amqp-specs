@@ -1,9 +1,3 @@
-Template - TC GitHub README page
-Updated: 07/27/2018
-Editor: Chet Ensign 
-
-=== README.md ===
-
 ## README
 
 Members of the [OASIS Advanced Message Queuing Protocol (AMQP) TC](https://www.oasis-open.org/committees/amqp/) create and manage technical content in this TC GitHub repository ( https://github.com/oasis-tcs/amqp-specs ) as part of the TC's chartered work (the program of work and deliverables described in its [charter](https://www.oasis-open.org/committees/amqp/charter.php).
