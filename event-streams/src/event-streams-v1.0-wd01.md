@@ -4,7 +4,7 @@
 
 # Event Stream Extensions for AMQP Version 1.0
 
-## Committee Specification Draft 01 /<br>Public Review Draft 01
+## Working Draft 01
 
 ## 03 June 2020
 
