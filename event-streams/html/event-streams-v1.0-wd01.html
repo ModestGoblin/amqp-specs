@@ -134,12 +134,9 @@
 <li><a href="#221-event-streams-epoch-link-property">2.2.1 event-streams-epoch link property</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#6-runtime-information">6 Runtime Information</a>
-<ul>
-<li><a href="#tbd">[[TBD]]</a></li>
-</ul></li>
-<li><a href="#7-safety-security-and-data-protection-considerations">7 Safety, Security, and Data Protection Considerations</a></li>
-<li><a href="#4-conformance">4 Conformance</a></li>
+<li><a href="#3-runtime-information">3 Runtime Information</a></li>
+<li><a href="#4-safety-security-and-data-protection-considerations">4 Safety, Security, and Data Protection Considerations</a></li>
+<li><a href="#5-conformance">5 Conformance</a></li>
 <li><a href="#appendix-a-acknowledgments">Appendix A. Acknowledgments</a></li>
 <li><a href="#appendix-b-revision-history">Appendix B. Revision History</a></li>
 </ul>
@@ -303,12 +300,17 @@ section ::= { ‘message_annotations’ | ‘m’ }
 <h3 id="221-event-streams-epoch-link-property">2.2.1 event-streams-epoch link property</h3>
 <p>The <code>event-streams-epoch</code> link property is a <code>long</code> integer value and describes the ownership epoch for the link relative to the consumer group and while at least one link is attached to the partition within the given consumer group.</p>
 <p>If no link is attached to node for the given partition and group, the epoch counter SHOULD be reset to zero.</p>
-<h1 id="6-runtime-information">6 Runtime Information</h1>
-<h2 id="tbd">[[TBD]]</h2>
-<h1 id="7-safety-security-and-data-protection-considerations">7 Safety, Security, and Data Protection Considerations</h1>
+<hr />
+<h1 id="3-runtime-information">3 Runtime Information</h1>
+<p>TBD.</p>
+<blockquote>
+<p>This section will describe a request/response operation to acquire information about the available partitions and offsets.</p>
+</blockquote>
+<hr />
+<h1 id="4-safety-security-and-data-protection-considerations">4 Safety, Security, and Data Protection Considerations</h1>
 <p>[[TBD]]</p>
 <hr />
-<h1 id="4-conformance">4 Conformance</h1>
+<h1 id="5-conformance">5 Conformance</h1>
 <p>[[TBD]]</p>
 <hr />
 <h1 id="appendix-a-acknowledgments">Appendix A. Acknowledgments</h1>
