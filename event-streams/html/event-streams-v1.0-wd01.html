@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Event Stream Extensions for AMQP Version 1.0</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="styles/markdown-styles-v1.7.3.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Event Stream Extensions for AMQP Version 1.0</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#oasis-logo"><img src="http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg" alt="OASIS Logo" /></a></li>
+<li><a href="#event-stream-extensions-for-amqp-version-10">Event Stream Extensions for AMQP Version 1.0</a>
+<ul>
+<li><a href="#committee-specification-draft-01--public-review-draft-01">Committee Specification Draft 01 /<br>Public Review Draft 01</a></li>
+<li><a href="#03-june-2020">03 June 2020</a>
+<ul>
+<li><a href="#technical-committee">Technical Committee:</a></li>
+<li><a href="#chairs">Chairs:</a></li>
+<li><a href="#editor">Editor:</a></li>
+<li><a href="#related-work">Related work:</a></li>
+<li><a href="#abstract">Abstract:</a></li>
+<li><a href="#status">Status:</a></li>
+<li><a href="#uri-patterns">URI patterns:</a></li>
+<li><a href="#citation-format">Citation format:</a></li>
+</ul></li>
+<li><a href="#notices">Notices</a></li>
+</ul></li>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#1-introduction">1 Introduction</a>
+<ul>
+<li><a href="#11-ipr-policy">1.1 IPR Policy</a></li>
+<li><a href="#12-terminology">1.2 Terminology</a></li>
+<li><a href="#13-normative-references">1.3 Normative References</a></li>
+<li><a href="#14-non-normative-references">1.4 Non-Normative References</a></li>
+</ul></li>
+<li><a href="#2-concepts-and-default-behaviors">2 Concepts and default behaviors</a>
+<ul>
+<li><a href="#21-partition-support">2.1 Partition support</a>
+<ul>
+<li><a href="#211-event-streams-partition-link-property">2.1.1 event-streams-partition link property</a></li>
+<li><a href="#212-event-streams-partition-delivery-annotation">2.1.2 event-streams-partition delivery annotation</a></li>
+<li><a href="#213-event-streams-group-key-message-annotation">2.1.3 event-streams-group-key message annotation</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#22-stream-delivery-offsets-and-filters">2.2 Stream delivery offsets and filters</a></li>
+<li><a href="#221-delivery-annotations">2.2.1 Delivery annotations</a></li>
+<li><a href="#2211-event-streams-offset">2.2.1.1 event-streams-offset</a></li>
+<li><a href="#2212-event-streams-timestamp">2.2.1.2 event-streams-timestamp</a></li>
+<li><a href="#222-delivery-filters">2.2.2 Delivery filters</a></li>
+<li><a href="#2221-event-streams-delivery-annotations-filter">2.2.2.1 event-streams-delivery-annotations filter</a></li>
+<li><a href="#2222-event-streams-sql-filter">2.2.2.2 event-streams-sql filter</a>
+<ul>
+<li><a href="#23-link-ownership">2.3 Link ownership</a>
+<ul>
+<li><a href="#221-event-streams-consumer-group-link-property">2.2.1 event-streams-consumer-group link property</a></li>
+<li><a href="#221-event-streams-epoch-link-property">2.2.1 event-streams-epoch link property</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#6-runtime-information">6 Runtime Information</a>
+<ul>
+<li><a href="#tbd">[[TBD]]</a></li>
+</ul></li>
+<li><a href="#7-safety-security-and-data-protection-considerations">7 Safety, Security, and Data Protection Considerations</a></li>
+<li><a href="#4-conformance">4 Conformance</a></li>
+<li><a href="#appendix-a-acknowledgments">Appendix A. Acknowledgments</a></li>
+<li><a href="#appendix-b-revision-history">Appendix B. Revision History</a></li>
+</ul>
+</nav>
+<h2 id="oasis-logo"><img src="http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg" alt="OASIS Logo" /></h2>
+<h1 id="event-stream-extensions-for-amqp-version-10">Event Stream Extensions for AMQP Version 1.0</h1>
+<h2 id="committee-specification-draft-01--public-review-draft-01">Committee Specification Draft 01 /<br>Public Review Draft 01</h2>
+<h2 id="03-june-2020">03 June 2020</h2>
+<h4 id="technical-committee">Technical Committee:</h4>
+<p><a href="https://www.oasis-open.org/committees/amqp/">OASIS Advanced Message Queuing Protocol (AMQP) TC</a></p>
+<h4 id="chairs">Chairs:</h4>
+<p>Rob Godfrey (<a href="mailto:rgodfrey@redhat.com">rgodfrey@redhat.com</a>), <a href="http://www.redhat.com/">Red Hat</a> <br />
+Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com</a>), <a href="http://www.microsoft.com/">Microsoft</a></p>
+<h4 id="editor">Editor:</h4>
+<p>Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com</a>), <a href="http://www.microsoft.com/">Microsoft</a></p>
+<h4 id="related-work">Related work:</h4>
+<p>This specification is related to:</p>
+<ul>
+<li><em>OASIS Advanced Message Queuing Protocol (AMQP) Version 1.0 Part 0: Overview</em>. Edited by Robert Godfrey, David Ingham, and Rafael Schloming. Latest version: <a href="http://docs.oasis-open.org/amqp/core/v1.0/amqp-core-overview-v1.0.html">http://docs.oasis-open.org/amqp/core/v1.0/amqp-core-overview-v1.0.html</a>.</li>
+</ul>
+<h4 id="abstract">Abstract:</h4>
+<p>This specification defines a set of AMQP extensions for interaction with event stream engines, including annotations for partition selection and filter definitions for indicating offsets into an extension stream to which a link shall be attached.</p>
+<h4 id="status">Status:</h4>
+<p>This document was last revised or approved by the OASIS Advanced Message Queuing Protocol (AMQP) TC on the above date. The level of approval is also listed above. Check the "Latest version" location noted above for possible later revisions of this document. Any other numbered Versions and other technical work produced by the Technical Committee (TC) are listed at <a href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=amqp#technical">https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=amqp#technical</a>.</p>
+<p>TC members should send comments on this specification to the TC's email list. Others should send comments to the TC's public comment list, after subscribing to it by following the instructions at the "Send A Comment" button on the TC's web page at <a href="https://www.oasis-open.org/committees/amqp/">https://www.oasis-open.org/committees/amqp/</a>.</p>
+<p>This specification is provided under the <a href="https://www.oasis-open.org/policies-guidelines/ipr#RF-on-RAND-Mode">RF on RAND</a> Mode of the <a href="https://www.oasis-open.org/policies-guidelines/ipr">OASIS IPR Policy</a>, the mode chosen when the Technical Committee was established. For information on whether any patents have been disclosed that may be essential to implementing this specification, and any offers of patent licensing terms, please refer to the Intellectual Property Rights section of the TC's web page (<a href="https://www.oasis-open.org/committees/amqp/ipr.php">https://www.oasis-open.org/committees/amqp/ipr.php</a>).</p>
+<p>Note that any machine-readable content (<a href="https://www.oasis-open.org/policies-guidelines/tc-process#wpComponentsCompLang">Computer Language Definitions</a>) declared Normative for this Work Product is provided in separate plain text files. In the event of a discrepancy between any such plain text file and display content in the Work Product's prose narrative document(s), the content in the separate plain text file prevails.</p>
+<h4 id="uri-patterns">URI patterns:</h4>
+<p>Initial publication URI:<br />
+<a href="https://docs.oasis-open.org/amqp/event-streams/v1.0/csprd01/event-streams-v1.0-csprd01.html">https://docs.oasis-open.org/amqp/event-streams/v1.0/csprd01/event-streams-v1.0-csprd01.html</a></p>
+<p>Permanent "Latest version" URI:<br />
+<a href="https://docs.oasis-open.org/amqp/event-streams/v1.0/event-streams-v1.0.html">https://docs.oasis-open.org/amqp/event-streams/v1.0/event-streams-v1.0.html</a></p>
+<p>(Note: Publication URIs are managed by OASIS TC Administration; please don't modify.)</p>
+<h4 id="citation-format">Citation format:</h4>
+<p>When referencing this specification the following citation format should be used:</p>
+<p><strong>[Event-Streams-v1.0]</strong></p>
+<p><em>Event Stream Extensions for AMQP Version 1.0</em>. Edited by Clemens Vasters. 03 June 2020. Working Draft 1. <a href="https://docs.oasis-open.org/amqp/event-streams/v1.0/csprd01/event-streams-v1.0-wd01.html">https://docs.oasis-open.org/amqp/event-streams/v1.0/csprd01/event-streams-v1.0-wd01.html</a>. Latest version: <a href="https://docs.oasis-open.org/amqp/event-streams/v1.0/event-streams-v1.0.html">https://docs.oasis-open.org/amqp/event-streams/v1.0/event-streams-v1.0.html</a>.</p>
+<hr />
+<h2 id="notices">Notices</h2>
+<p>Copyright © OASIS Open 2020. All Rights Reserved.</p>
+<p>All capitalized terms in the following text have the meanings assigned to them in the OASIS Intellectual Property Rights Policy (the "OASIS IPR Policy"). The full <a href="https://www.oasis-open.org/policies-guidelines/ipr">Policy</a> may be found at the OASIS website.</p>
+<p>This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published, and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this section are included on all such copies and derivative works. However, this document itself may not be modified in any way, including by removing the copyright notice or references to OASIS, except as needed for the purpose of developing any document or deliverable produced by an OASIS Technical Committee (in which case the rules applicable to copyrights, as set forth in the OASIS IPR Policy, must be followed) or as required to translate it into languages other than English.</p>
+<p>The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns.</p>
+<p>This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY OWNERSHIP RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.</p>
+<p>OASIS requests that any OASIS Party or any other party that believes it has patent claims that would necessarily be infringed by implementations of this OASIS Committee Specification or OASIS Standard, to notify OASIS TC Administrator and provide an indication of its willingness to grant patent licenses to such patent claims in a manner consistent with the IPR Mode of the OASIS Technical Committee that produced this specification.</p>
+<p>OASIS invites any party to contact the OASIS TC Administrator if it is aware of a claim of ownership of any patent claims that would necessarily be infringed by implementations of this specification by a patent holder that is not willing to provide a license to such patent claims in a manner consistent with the IPR Mode of the OASIS Technical Committee that produced this specification. OASIS may include such claims on its website, but disclaims any obligation to do so.</p>
+<p>OASIS takes no position regarding the validity or scope of any intellectual property or other rights that might be claimed to pertain to the implementation or use of the technology described in this document or the extent to which any license under such rights might or might not be available; neither does it represent that it has made any effort to identify any such rights. Information on OASIS' procedures with respect to rights in any document or deliverable produced by an OASIS Technical Committee can be found on the OASIS website. Copies of claims of rights made available for publication and any assurances of licenses to be made available, or the result of an attempt made to obtain a general license or permission for the use of such proprietary rights by implementers or users of this OASIS Committee Specification or OASIS Standard, can be obtained from the OASIS TC Administrator. OASIS makes no representation that any information or list of intellectual property rights will at any time be complete, or that any claims in such list are, in fact, Essential Claims.</p>
+<p>The name "OASIS" is a trademark of <a href="https://www.oasis-open.org/">OASIS</a>, the owner and developer of this specification, and should be used only to refer to the organization and its official outputs. OASIS welcomes reference to, and implementation and use of, specifications, while reserving the right to enforce its marks against misleading uses. Please see <a href="https://www.oasis-open.org/policies-guidelines/trademark">https://www.oasis-open.org/policies-guidelines/trademark</a> for above guidance.</p>
+<hr />
+<h1 id="table-of-contents">Table of Contents</h1>
+<p>[[TOC will be inserted here]]</p>
+<hr />
+<h1 id="1-introduction">1 Introduction</h1>
+<p>This specification defines a set of AMQP extensions for interaction with event stream engines, including annotations for partition selection and filter definitions for indicating offsets into an extension stream to which a link shall be attached.</p>
+<p>In the context of this specification, the term "event stream engine" describes a particular archetype of AMQP node that manages sequences of events (messages) in an ordered log structure.</p>
+<p>Event logs differ from queue-like structures in that they do not track message delivery state across competing receivers. The message delivery state is instead tracked for each link at its terminus. When attaching a <code>receive</code> AMQP link, the receiver MAY indicate an initial offset into the retained event log. The delivery of events then progresses in log order from that initial offset to more recently added events. Omitting the offset results in delivery of events added after attaching the link.</p>
+<p>Event stream engines conforming to this specification MAY implement any of the capabilities defined here and they MUST implement the default behaviors defined here when those capabilities are not explicitly used.</p>
+<h2 id="11-ipr-policy">1.1 IPR Policy</h2>
+<p>This specification is provided under the <a href="https://www.oasis-open.org/policies-guidelines/ipr#RF-on-RAND-Mode">RF on RAND</a> Mode of the <a href="https://www.oasis-open.org/policies-guidelines/ipr">OASIS IPR Policy</a>, the mode chosen when the Technical Committee was established. For information on whether any patents have been disclosed that may be essential to implementing this specification, and any offers of patent licensing terms, please refer to the Intellectual Property Rights section of the TC's web page (<a href="https://www.oasis-open.org/committees/amqp/ipr.php">https://www.oasis-open.org/committees/amqp/ipr.php</a>).</p>
+<h2 id="12-terminology">1.2 Terminology</h2>
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [<a href="#rfc2119">RFC2119</a>] and [<a href="#rfc8174">RFC8174</a>] when, and only when, they appear in all capitals, as shown here.</p>
+<h2 id="13-normative-references">1.3 Normative References</h2>
+<h6 id="amqp-v10">[AMQP-v1.0]</h6>
+<p><em>OASIS Advanced Message Queuing Protocol (AMQP) Version 1.0 Part 0: Overview</em>. Edited by Robert Godfrey, David Ingham, and Rafael Schloming. Latest version: <a href="http://docs.oasis-open.org/amqp/core/v1.0/amqp-core-overview-v1.0.html">http://docs.oasis-open.org/amqp/core/v1.0/amqp-core-overview-v1.0.html</a>.</p>
+<h6 id="filtex-v10">[FILTEX-v1.0]</h6>
+<p><em>AMQP Filter Expressions Version 1.0</em>. Edited by Clemens Vasters. Latest version: <a href="http://docs.oasis-open.org/amqp/filtex/v1.0/filtex-v1.0.docx">http://docs.oasis-open.org/amqp/filtex/v1.0/filtex-v1.0.docx</a></p>
+<h6 id="rfc2119">[RFC2119]</h6>
+<p>Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>.</p>
+<h6 id="rfc8174">[RFC8174]</h6>
+<p>Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174, May 2017, <a href="http://www.rfc-editor.org/info/rfc8174">http://www.rfc-editor.org/info/rfc8174</a>.</p>
+<h2 id="14-non-normative-references">1.4 Non-Normative References</h2>
+<h6 id="rfc3552">[RFC3552]</h6>
+<p>Rescorla, E. and B. Korver, "Guidelines for Writing RFC Text on Security Considerations", BCP 72, RFC 3552, DOI 10.17487/RFC3552, July 2003, <a href="https://www.rfc-editor.org/info/rfc3552">https://www.rfc-editor.org/info/rfc3552</a>.</p>
+<h1 id="2-concepts-and-default-behaviors">2 Concepts and default behaviors</h1>
+<p>The following terminology is used in this specification to clarify roles. These definitions are narrower than their use in the core AMQP specification.</p>
+<ul>
+<li><code>producer</code> is the sender of events into the event log.</li>
+<li><code>consumer</code> is the receiver of events from the event log.</li>
+<li><code>event log node</code> is where AMQP links of senders and receivers attach.</li>
+</ul>
+<h2 id="21-partition-support">2.1 Partition support</h2>
+<p>An event log managed by the event stream node MAY be split into multiple parallel partitions that are reachable under the same network address. A single event log might also be shared by multiple AMQP containers/nodes that each have a separate network address and are each responsible for one or more partitions.</p>
+<p>The association between a producer/consumer and a partition MAY be chosen using link properties when the link is being attached. The bi-directional negotiation capabilities of AMQP apply here: A consumer MAY request being associated with a particular partition, but the responding event log node MAY also assign a partition if none has been requested.</p>
+<p>A producer's <code>send</code> link being attached to an event log node MAY request association with a specific partition using the <a href="#211-event-streams-partition-link-property"><code>event-streams-partition</code> link property</a>. If the requested partition does not exist, attaching the link MUST be rejected by the event log node. The event log node MAY assign a partition when none has been requested. It MUST NOT assign a partition other than the one that has been requested.</p>
+<p>If no partition is assigned, the default behavior MUST be for a <code>send</code> link to be partition agnostic and for any partition-related hints to flow via delivery annotations, which are defined further below in this section.</p>
+<p>A consumer's <code>receive</code> link being attached to an event log node MAY request association with a specific partition using the the <a href="#211-event-streams-partition-link-property"><code>event-streams-partition</code> link property</a>. If the requested partition does not exist, attaching the link MUST fail. If the event log is partitioned and no association has been requested, the event log node MUST associate a partition with the link.</p>
+<p>For both <code>send</code> and <code>receive</code> links, the effective associated partition MUST be expressed with the <a href="#211-event-streams-partition-link-property"><code>event-streams-partition</code> link property</a> set by the event log node.</p>
+<h3 id="211-event-streams-partition-link-property">2.1.1 event-streams-partition link property</h3>
+<p>The <code>event-streams-partition</code> link property is a <code>symbol</code> value and describes the partition with which the link is associated. When set by the producer or consumer, the property value is a request for association with the given partition. When set by the event log node, the value is the effective association.</p>
+<p>When not set for a producer 'send' link, the link is partition-agnostic.</p>
+<h3 id="212-event-streams-partition-delivery-annotation">2.1.2 event-streams-partition delivery annotation</h3>
+<p>The <code>event-streams-partition</code> delivery annotation is a <code>symbol</code> value and describes the partition to which the message carrying it MUST be routed or from which partition is has been retrieved.</p>
+<p>If the link over which a message is routed is not partition agnostic with or if the link is not associated with the exact same partition, the transfer MUST be rejected.</p>
+<p>If the event log is partitioned, the delivery annotation MUST be added by the event log node before delivery to consumers. A consumer SHOULD strip the annotation before forwarding it.</p>
+<h3 id="213-event-streams-group-key-message-annotation">2.1.3 event-streams-group-key message annotation</h3>
+<p>The <code>event-streams-key</code> message annotation is a <code>string</code> value and is a grouping key that identifies events that are related and SHOULD therefore be treated as a group for partitioning purposes.</p>
+<p>This is an annotation and therefore differs from the core message property <code>group-id</code> by allowing overrides as messages get routed through multiple partitioned intermediaries where partitioning concerns might vary.</p>
+<p>When set by the producer and used over a partition agnostic link, the value of the annotation MAY be used by the event log to associate the message with a partition. If the key is used in this way, the event log SHOULD associate the same partition with the same key at all times until the number of partitions changes.</p>
+<h1 id="22-stream-delivery-offsets-and-filters">2.2 Stream delivery offsets and filters</h1>
+<p>As stated in the introduction, event logs differ from queue-like structures in that they only track message delivery state at the AMQP link level. While attaching a <code>receive</code> AMQP link, the consumer MAY indicate a desired initial offset into the retained log or some other condition based on which events become eligible for delivery. The desired offset is expressed using an AMQP filter expression.</p>
+<h1 id="221-delivery-annotations">2.2.1 Delivery annotations</h1>
+<p>The delivery filter expressions refer to a set of delivery annotations defined in the following. These delivery annotations MUST be added by the event log to all messages delivered to consumers.</p>
+<h1 id="2211-event-streams-offset">2.2.1.1 event-streams-offset</h1>
+<p>The <code>event-streams-offset</code> delivery annotation property is a <code>symbol</code> expression whose internal syntax is opaque to the receiver. Receivers MUST NOT interpret or construct offset values. The offset value represents the relative position of the event to the beginning of the log.</p>
+<p>Even though the syntax is opaque, the chosen syntax MUST ensure that the lexicographical rank of the <code>event-streams-offset</code> of any event in the log MUST be greater than the lexicographical rank of any other event preceding it in the order of the log.</p>
+<p>Receivers learn about offset values either by obtaining the runtime information of a partition, which contains the offset of the most recently added event, or by retaining the value of the last <code>event-streams-offset</code> delivery annotation property they read from the partition.</p>
+<p>For use with <a href="#222-delivery-filters">delivery filter expressions</a>, the reserved values MAY be used as constants for comparand values:</p>
+<ul>
+<li>"@earliest" is smaller than all existing offsets in the log.</li>
+<li>"@latest" is greater than all existing offsets in the log.</li>
+</ul>
+<h1 id="2212-event-streams-timestamp">2.2.1.2 event-streams-timestamp</h1>
+<p>The <code>event-streams-timestamp</code> delivery annotation property is a timestamp expression and reflects the absolute UTC instant when the event has been added to the event log. This is different from the <code>creation-time</code> message property that is set by the sender.</p>
+<p>Multiple events added to the log around the same instant MAY have identical timestamps due to the UTC clock resolution concerns. The timestamp only serves as a filter criterion to determine a desired offset into the stream, but MUST NOT be used to determine the order of events.</p>
+<p>A distributed event log implementation where the ownership of a log changes between different hosts and where clocks might not be fully synchronized MAY record <code>event-streams-timestamp</code> values that reflect the existing clock skew, meaning that some events that appear later in the log than a given event might yet carry earlier UTC timestamps.</p>
+<h1 id="222-delivery-filters">2.2.2 Delivery filters</h1>
+<p>A delivery filter specifies which events are eligible for delivery from the event log. The delivery filter is provided as a source filter during link attach.</p>
+<p>Delivery filters MAY be expressed using any AMQP filter expression that is supported by the source (the event log node). This specification defines two simplified filters that allow for a conforming implementation without having to implement the full <a href="#filtex-v10">AMQP filter expressions</a> specification in a conforming fashion.</p>
+<p>The source filter MUST be evaluated against the retained events in the log from earliest to latest. Events matching the source expression are eligible for delivery.</p>
+<h1 id="2221-event-streams-delivery-annotations-filter">2.2.2.1 event-streams-delivery-annotations filter</h1>
+<p>The <code>event-streams-delivery-annotations</code> filter type applies to AMQP delivery annotations section (AMQP 3.2.2). The filter evaluates to true if all annotations enclosed in the filter expression match the respective delivery annotation map entries in the message.</p>
+<p>Only the <a href="#2211-event-streams-offset"><code>event-streams-offset</code></a> and/or <a href="#2212-event-streams-timestamp"><code>event-streams-timestamp</code></a> delivery annotation properties are eligible to be used with this filter.</p>
+<p>The property values match the given values in the filter expression, if the value of the property is greater or equal to the value given in the filter expression.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode XML"><code class="sourceCode xml"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-delivery-annotations-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;amqp:map&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-delivery-annotations-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000200&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">&lt;/type&gt;</span> </span></code></pre></div>
+<p>The filter-type is “amqp:event-streams-delivery-annotations-filter”, with type-code 0x00000000:0x00000200</p>
+<h1 id="2222-event-streams-sql-filter">2.2.2.2 event-streams-sql filter</h1>
+<p>The event streams SQL filter expression is a constrained subset of the SQL filter expression defined in <a href="#filtex-v10">AMQP filter expressions [FILTEX, 6]</a>.</p>
+<p>The grammar builds on the grammar defined for those SQL filters, but is constrained as follows:</p>
+<pre><code>predicate ::=  &lt;boolean_constant&gt; |
+              | &lt;expression&gt; &lt;comparison-operator&gt; &lt;expression&gt;
+              | &lt;predicate&gt; &lt;binary-logical-operator&gt; &lt;predicate&gt;
+expression ::= &lt;constant&gt; | &lt;field_value&gt;  
+constant   ::= &lt;string_constant&gt; | &lt;integer_constant&gt;
+field_value := &lt;field&gt;
+field ::= &lt;section&gt; ’.’&lt;field_name&gt;
+section ::= { ‘message_annotations’ | ‘m’ }
+</code></pre>
+<p>This grammar subset allows for a minimal implementation that is limited to evaluating the delivery annotation properties defined here while being interoperable with the full SQL filter syntax.</p>
+<p>Examples:</p>
+<ul>
+<li>Start from event at offset "a4c5" exclusively: <code>m.event-streams-offset &gt; '100'</code></li>
+<li>Start from event at offset "a4c5" inclusively: <code>m.event-streams-offset &gt;= '100'</code></li>
+<li>Start from event received after the timestamp: <code>m.event-streams-timestamp &gt; 1585672841</code></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode XML"><code class="sourceCode xml"><span id="cb3-1"><a href="#cb3-1"></a> <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-sql-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;sql-filter&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-sql-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000201&quot;</span><span class="kw">/&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">&lt;/type&gt;</span></span></code></pre></div>
+<p>The filter-type is “amqp:event-streams-sql-filter”, with type-code 0x00000000:0x00000201</p>
+<h2 id="23-link-ownership">2.3 Link ownership</h2>
+<p>An implementation MAY constrain the number of concurrent receivers that can receive from a log or its partitions.</p>
+<p>In scenarios where a group of multiple concurrent event processors want to receive events from a partitioned event log and where they use an external consensus mechanism to agree on which event processor owns which partition, it is desireable to restrict each partition to one (the owning) receiver from the group and for event processors to "steal" ownership of the partition as assignments amongst the group change.</p>
+<p>This specification does not prescribe any algorithm or strategy for reaching such consensus, but only a mechanism for realizing its outcome:</p>
+<p>For an event log that is partitioned, a link MAY be associated with a partition and a consumer group when the respective link properties are provided during <code>attach</code>. For the combination of partition and consumer group, the node maintains a <code>long</code>-valued <code>epoch</code> counter, which is seeded with zero and returned in the <code>event-streams-epoch</code> link property to the receiver during a successful attempt to attach.</p>
+<p>Any subsequent attempt to attach a link with the same combination of partition and consumer group link property values will be rejected while there is an active link and unless the newly attaching receiver provides an epoch counter greater than the current epoch counter value using the <code>event-streams-epoch</code> link property. If that condition is true, the new epoch counter value is recorded, any existing link for the given partition and consumer group is closed by the node, and the new link is attached.</p>
+<p>Whenever the link for a partition within a group is closed by the receiver and therefore no links remain, the respective epoch counter is reset to zero.</p>
+<h3 id="221-event-streams-consumer-group-link-property">2.2.1 event-streams-consumer-group link property</h3>
+<p>The <code>event-streams-consumer-group</code> link property is a <code>string</code> value that identifies a group of consumers and provides a scope for the epoch counter.</p>
+<p>An implementation MAY require for the group identifier to correspond to a configured item on the event stream engine and otherwise refuse to attach the link.</p>
+<h3 id="221-event-streams-epoch-link-property">2.2.1 event-streams-epoch link property</h3>
+<p>The <code>event-streams-epoch</code> link property is a <code>long</code> integer value and describes the ownership epoch for the link relative to the consumer group and while at least one link is attached to the partition within the given consumer group.</p>
+<p>If no link is attached to node for the given partition and group, the epoch counter SHOULD be reset to zero.</p>
+<h1 id="6-runtime-information">6 Runtime Information</h1>
+<h2 id="tbd">[[TBD]]</h2>
+<h1 id="7-safety-security-and-data-protection-considerations">7 Safety, Security, and Data Protection Considerations</h1>
+<p>[[TBD]]</p>
+<hr />
+<h1 id="4-conformance">4 Conformance</h1>
+<p>[[TBD]]</p>
+<hr />
+<h1 id="appendix-a-acknowledgments">Appendix A. Acknowledgments</h1>
+<p>(Note: A Work Product approved by the TC must include a list of people who participated in the development of the Work Product. This is generally done by collecting the list of names in this appendix. This list shall be initially compiled by the Chair, and any Member of the TC may add or remove their names from the list by request.<br />
+Remove this note before submitting for publication.)</p>
+<p>The following individuals have participated in the creation of this specification and are gratefully acknowledged:</p>
+<p><strong>AMQP TC Members:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">First Name</th>
+<th style="text-align: left;">Last Name</th>
+<th style="text-align: left;">Company</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Philippe</td>
+<td style="text-align: left;">Alman</td>
+<td style="text-align: left;">Something Networks</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">Amirnovman</td>
+<td style="text-align: left;">Company B</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kris</td>
+<td style="text-align: left;">Anderman</td>
+<td style="text-align: left;">Mini Micro</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darren</td>
+<td style="text-align: left;">Anstman</td>
+<td style="text-align: left;">Big Networks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="appendix-b-revision-history">Appendix B. Revision History</h1>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Revision</th>
+<th style="text-align: left;">Date</th>
+<th style="text-align: left;">Editor</th>
+<th style="text-align: left;">Changes Made</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">specname-v1.0-wd01</td>
+<td style="text-align: left;">yyyy-mm-dd</td>
+<td style="text-align: left;">Editor Name</td>
+<td style="text-align: left;">Initial working draft</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
