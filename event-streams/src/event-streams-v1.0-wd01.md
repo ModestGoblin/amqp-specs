@@ -6,7 +6,7 @@
 
 ## Working Draft 01
 
-## 03 June 2020
+## 22 June 2020
 
 #### Technical Committee:
 [OASIS Advanced Message Queuing Protocol (AMQP)
@@ -153,6 +153,7 @@ https://www.oasis-open.org/policies-guidelines/trademark for above guidance.
 -------
 
 # Table of Contents
+
 [[TOC will be inserted here]]
 
 -------
@@ -224,92 +225,304 @@ Rescorla, E. and B. Korver, "Guidelines for Writing RFC Text on Security
 Considerations", BCP 72, RFC 3552, DOI 10.17487/RFC3552, July 2003,
 https://www.rfc-editor.org/info/rfc3552.
 
-# 2 Concepts and default behaviors
+# 2 Terminology
 
 The following terminology is used in this specification to clarify roles. These
 definitions are narrower than their use in the core AMQP specification.
 
+- `event stream engine` is a software infrastructure managing one or more event
+  logs.
+- `event log` maintains a sequence of events.
+- `partition` is a subdivision of an `event log`.
+- `event log node` refers to the AMQP node where links of senders and receivers
+  attach.
 - `producer` is the sender of events into the event log.
 - `consumer` is the receiver of events from the event log.
-- `event log node` is where AMQP links of senders and receivers attach.
+- `consumer group` is a named group of consumers that coordinate consumption of
+  events across multiple partitions.
 
+# 3 Capabilities and Default Behaviors 
 
-## 2.1 Partition support
+## 3.1 Connection and Link Capabilities
 
-An event log managed by the event stream node MAY be split into multiple
-parallel partitions that are reachable under the same network address. A single
-event log might also be shared by multiple AMQP containers/nodes that each have
-a separate network address and are each responsible for one or more partitions.
+On connection establishment, the event log node MUST indicate its support of
+this specification through the exchange of a connection capability (see Section
+2.7.1, [AMQP](#amqp-v10)). The capability allows for the consumer or producer to detect
+whether extensions as defined in this specification are understood and may be
+used.
 
-The association between a producer/consumer and a partition MAY be chosen using
-link properties when the link is being attached. The bi-directional negotiation
-capabilities of AMQP apply here: A consumer MAY request being associated with a
-particular partition, but the responding event log node MAY also assign a
-partition if none has been requested.
+| Capability Name         | Definition
+| ------------------------|---------------------------------------------------------------- |
+| AMQP_EVENT_STREAMS_V1_0 | If present in the offered-capabilities field of the open frame, the sender of the open supports the use of event streams extensions. |
 
-A producer's `send` link being attached to an event log node MAY request
-association with a specific partition using the [`event-streams-partition` link
-property](#211-event-streams-partition-link-property). If the requested
-partition does not exist, attaching the link MUST be rejected by the event log
-node. The event log node MAY assign a partition when none has been requested. It
-MUST NOT assign a partition other than the one that has been requested.
+## 3.2 Default Behaviors
 
-If no partition is assigned, the default behavior MUST be for a `send` link to
-be partition agnostic and for any partition-related hints to flow via delivery
-annotations, which are defined further below in this section.
+This specification does not modify or override any rules of the core AMQP 1.0
+specification.
 
-A consumer's `receive` link being attached to an event log node MAY request
-association with a specific partition using the the [`event-streams-partition`
-link property](#211-event-streams-partition-link-property). If the requested
-partition does not exist, attaching the link MUST fail. If the event log is
-partitioned and no association has been requested, the event log node MUST
-associate a partition with the link.
+Even with the capability being announced at the connection level, all additional
+behaviors defined here are optional, which means that a producer or consumer
+MUST be able to successfully interact with a conforming event log implementation
+just as with any regular AMQP node, for instance:
 
-For both `send` and `receive` links, the effective associated partition MUST be
-expressed with the [`event-streams-partition` link
-property](#211-event-streams-partition-link-property) set by the event log node.
+* Producer and consumers that do not choose a partition on a partitioned event
+  log are either assigned a partition by the event log node, or their links are
+  left partition-agnostic.
+* Producers are not required to annotate events with partition hints, even on
+  partition-agnostic links. The event log node chooses the partition in absence
+  of such hints.
+* Consumers are not required to provide offset filter information. If no filter
+  is provided, the consumer is eligible to receive events accepted by the event
+  log node after the link was attached.
+* Consumers can rely on all existing AMQP mechanisms for delivery-state tracking
+  provided by the AMQP source terminus of the event log node. This means that
+  after attaching a link, the consumer is not required to keep track of offsets
+  for initiating further transfers while the link exists. The source might even
+  offer link durability [(AMQP 1.0, 3.5.5)](#amqp-v10) with full recovery of
+  unsettled state in the case of disconnects.
 
-### 2.1.1 event-streams-partition link property
+# 4 Partition support
+
+An event log maintains a sequence of events. An event log MAY be split into
+multiple parallel partitions that are reachable under the same network address,
+or the responsibility for maintaining an event log might also be shared across
+multiple AMQP containers/nodes that each have a separate network address and are
+each responsible for one or more partitions of the event log.
+
+Producers and consumers attach to the event log via AMQP links. Those links MAY
+be bound to one, specific partition (partition-bound) or they MAY be
+partition-agnostic. On partition-agnostic links, producers MAY provider
+transfer-level hints for which partition the transfer ought to be routed to.
+
+This model allows for a range of negotiation options for how consumers are
+affiliated with partitions:
+
+* Producer and consumers choose partitions on their own
+* Producer and consumers are assigned partitions by the event log node
+* Producer and consumers are partition-agnostic and can send/receive from any
+  partition
+
+The model composes with AMQP link-level redirects as defined in [AMQP 1.0,
+2.8.18](#amqp-v10). With link-level redirects, the event log node MAY refuse to
+attach a link, but rather point to a different AMQP container where the
+requested or assigned partition is available.
+
+If the event log assigns a partition-bound links and wants to renegotiate those
+assignments, it MAY gracefully close some or all attached links and the
+respective producer or consumer SHOULD then attempt to establish a new link.
+
+The binding of a producer or consumer to a partition MAY be negotiated using link
+properties when the link is being attached. A consumer or producer MAY request
+for the link to be bound to a particular partition and the responding event log
+node MAY also bind the link to a partition if no binding has been requested. If
+the event log node is not willing grant the request for binding to a specific
+partition, it MUST detach the link.
+
+Partition identifiers are opaque to consumers and producers and of type
+`symbol`. Consumers and producers learn about an event log node's available
+partitions and their identifiers using a [runtime
+information](#6-runtime-information) request.
+
+## 4.1 Binding producer links
+
+A producer MAY request for the 'send' link to be bound to a specific partition
+using the
+[`event-streams-partition`](#461-event-streams-partition-link-property) link
+property. 
+
+If the requested partition does not exist or if the event log node denies the
+request, attaching the link MUST be rejected by the event log node.
+
+The event log node MAY bind the link a partition when none has been requested by
+the producer.
+
+If the link becomes partition-bound, the event log node MUST set the
+[`event-streams-partition`](#461-event-streams-partition-link-property) link
+property to the bound partition.
+
+## 4.2 Partition annotations in producer transfers
+
+If a `send` link is partition-agnostic, the sender MAY provide partition-related
+hints to the `event log node` with the
+[`event-streams-target-partition`](#465-event-streams-target-partition-delivery-annotation)
+delivery annotation or the
+[`event-streams-group-key`](#466-event-streams-group-key-message-annotation)
+message annotation.
+
+If the `event-streams-target-partition` delivery annotation is added to a
+transfer on a partition-bound link, its value MUST match the `event-streams-partition`
+link property's value. Otherwise, the transfer MUST be rejected.
+
+## 4.3 Binding Consumer Links
+
+A consumer MAY request for the 'receive' link to be bound to a specific
+partition using the
+[`event-streams-partition`](#461-event-streams-partition-link-property) link
+property.
+
+If the requested partition does not exist or if the event log node denies the
+request, attaching the link MUST be rejected by the event log node.
+
+The event log node MAY bind the link a partition when none has been requested by
+the consumer.
+
+If the link becomes partition-bound, the event log node MUST set the
+[`event-streams-partition`](#461-event-streams-partition-link-property) link
+property to the bound partition.
+
+## 4.4 Partition annotations in consumer transfers
+
+The
+[`event-streams-source-partition`](#464-event-streams-source-partition-delivery-annotation)
+delivery annotation MUST be added to all transfers to consumers made over
+partition-agnostic links.
+
+The annotation is OPTIONAL for transfers over partition-bound links, and if
+present, its value MUST be equal to the `event-streams-partition` link property
+value. Otherwise, the transfer MUST be rejected.
+
+## 4.5 Consumer groups
+
+In scenarios where a group of multiple concurrent event consumers want to
+receive mutually exclusive subsets of events from a partitioned event log, it is
+desireable to restrict each partition to one (the "owning") receiver from the
+group and for event consumers to shift ownership of the partition dynamically.
+Consumers might also want to use an external consensus mechanism to agree on
+which event processor owns which partition rather than have the event log engine
+be in the loop.
+
+This specification does not prescribe any algorithm or strategy for reaching
+consensus on ownership of partitions amongst a group of consumers, but it
+provides mechanisms for realizing their outcomes.
+
+A consumer link MAY be bound to a consumer group by setting the
+[`event-streams-consumer-group`](#462-event-streams-consumer-group-link-property)
+link property to the name of the group during attach.
+
+The consumer group MAY be dynamically created during link attach or MAY require
+for there to be a such named pre-configured entity inside of event log node, in
+which case attaching the link MAY fail if such an entity does not exist.
+
+The event log node MUST NOT assign a consumer group if the consumer does not
+request such a binding. Links that are bound to consumer groups MUST also be
+bound to a partition; they cannot be partition-agile.
+
+The selection and binding of a partition to the consumer within a given consumer
+group follows the negotiation model explained earlier in this section.
+
+If consumer groups are being used, the event log node MUST allow at most one
+active 'receive' link for each combination of partition and consumer group.
+
+### 4.5.1 Event log node-assigned partition ownership
+
+If the event log node wants to force renegotiation of partition assignments
+amongst a consumer group, it SHOULD gracefully close all affected links and the
+respective consumers SHOULD attempt to establish a new link to request or
+receive new assignments.
+
+### 4.5.2 Consumer-negotiated partition ownership
+
+To allow consumers to negotiate partition ownership using an external consensus
+algorithm that does not establish transparent communication amongst the group of
+consumers, new assignments of consumers to partitions within the group need to
+be able to break the links of existing assignments.
+
+For instance, if the consensus algorithm for ownership of a partition were based
+on a expiring lease on some external object and a competing consumer were to
+acquire that lease upon expiration, the new owner ought to be able to promptly
+take ownership of the partition, without asking for the previous owner's
+explicit cooperation.
+
+To facilitate this, for each combination of partition and consumer group, the
+event log node maintains a `ulong`-valued `epoch` counter, which is seeded with
+the value zero and is returned in the `event-streams-epoch` link property to the
+receiver during a successful attempt to attach.
+
+Any subsequent attempt to attach a link to the same combination of partition and
+consumer group of an already active link MUST be rejected UNLESS the newly
+attaching receiver provides an epoch counter greater than the current epoch
+counter value, expressed using the `event-streams-epoch` link property in attach.
+
+If the epoch counter is provided and greater than the current epoch value, any
+existing link for the given partition and consumer group is closed by the node,
+the new link is attached, and the new epoch counter value is recorded.
+
+Whenever the link for a partition within a group is closed by the receiver and
+no links remain, the respective epoch counter MAY be reset to zero.  
+
+### 4.6. Property definitions
+
+#### 4.6.1 event-streams-partition link property
 
 The `event-streams-partition` link property is a `symbol` value and describes
-the partition with which the link is associated. When set by the producer or
-consumer, the property value is a request for association with the given
-partition. When set by the event log node, the value is the effective
-association.
+the partition to which the link is bound.
 
-When not set for a producer 'send' link, the link is partition-agnostic.
+When set by the producer or consumer, the property value is a request for the
+link to be bound to the given partition. When set by the event log node, the
+value reflects the effective association.
 
-### 2.1.2 event-streams-partition delivery annotation
+When not set on the negotiated link, the link is partition-agnostic.
 
-The `event-streams-partition` delivery annotation is a `symbol` value and
-describes the partition to which the message carrying it MUST be routed or from
-which partition is has been retrieved.
+### 4.6.2 event-streams-consumer-group link property
 
-If the link over which a message is routed is not partition agnostic with or if
-the link is not associated with the exact same partition, the transfer MUST be
-rejected.
+The `event-streams-consumer-group` link property is a `string` value that
+identifies a group of consumers and provides a scope for the epoch counter.
+
+An implementation MAY require for the group identifier to correspond to a
+configured item on the event stream engine and otherwise refuse to attach the
+link.
+
+A negotiated link carrying this property MUST be partition-bound.
+
+### 4.6.3 event-streams-epoch link property
+
+The `event-streams-epoch` link property is a `long` integer value and describes
+the ownership epoch counter for the link relative to the consumer group and
+while at least one link is attached to the partition within the given consumer
+group.
+
+If no link is attached to node for the given partition and group, the epoch
+counter MAY be reset to zero.
+
+#### 4.6.4 event-streams-source-partition delivery annotation
+
+The `event-streams-source-partition` delivery annotation is a `symbol` value and
+describes the partition from which partition the transfer originates.
 
 If the event log is partitioned, the delivery annotation MUST be added by the
-event log node before delivery to consumers. A consumer SHOULD strip the
-annotation before forwarding it.
+event log node before delivery to consumers. 
 
-### 2.1.3 event-streams-group-key message annotation
+A consumer MUST strip the annotation if it forwards the message onwards.
 
-The `event-streams-key` message annotation is a `string` value and
-is a grouping key that identifies events that are related and SHOULD therefore
-be treated as a group for partitioning purposes.
+#### 4.6.5 event-streams-target-partition delivery annotation
 
-This is an annotation and therefore differs from the core message property
-`group-id` by allowing overrides as messages get routed through multiple
-partitioned intermediaries where partitioning concerns might vary.
+The `event-streams-target-partition` delivery annotation is a `symbol` value and
+describes the partition to which the transfer MUST be routed.
 
-When set by the producer and used over a partition agnostic link, the value of
-the annotation MAY be used by the event log to associate the message with a
-partition. If the key is used in this way, the event log SHOULD associate the
-same partition with the same key at all times until the number of partitions
-changes.
+If the link is not partition-agnostic and if the link is not bound to the exact
+same partition, the transfer MUST be rejected. If the partition does not exist,
+the transfer MUST be rejected.
 
-# 2.2 Stream delivery offsets and filters 
+The event log MUST strip the annotation once it has evaluated it.
+
+#### 4.6.6 event-streams-group-key message annotation
+
+The `event-streams-group-key` message annotation is a `string` value and is a grouping
+key that identifies events that are related and SHOULD therefore be treated as a
+group for partitioning purposes.
+
+This value differs from the AMQP core message property `group-id` in being an
+annotation and therefore allowing overrides as messages get routed through
+multiple partitioned intermediaries where partitioning concerns and therefore
+the choice of grouping keys might vary.
+
+When set by the producer and used over a partition-agnostic link, the value of
+the annotation MAY be used by the event log node to bind the transfer to a
+partition. If the key is used in this way, the event log SHOULD bind transfers
+with the key to the same partition at all times and until the number of
+partitions changes.
+
+# 5 Stream delivery offsets and filters 
 
 As stated in the introduction, event logs differ from queue-like structures in
 that they only track message delivery state at the AMQP link level. While
@@ -318,22 +531,24 @@ offset into the retained log or some other condition based on which events
 become eligible for delivery. The desired offset is expressed using an AMQP
 filter expression.
 
-# 2.2.1 Delivery annotations
+## 5.1 Delivery annotations
 
 The delivery filter expressions refer to a set of delivery annotations defined
-in the following. These delivery annotations MUST be added by the event log to
-all messages delivered to consumers.
+in the following. 
 
-# 2.2.1.1 event-streams-offset
+For a conforming implementation, these delivery annotations MUST be added by the
+event log node to all messages delivered to consumers.
+
+### 5.1.1 event-streams-offset
 
 The `event-streams-offset` delivery annotation property is a `symbol` expression
 whose internal syntax is opaque to the receiver. Receivers MUST NOT interpret or
-construct offset values. The offset value represents the relative position of
+construct offset values. The offset value represents a relative position of
 the event to the beginning of the log.
 
 Even though the syntax is opaque, the chosen syntax MUST ensure that the
-lexicographical rank of the `event-streams-offset` of any event in the log MUST
-be greater than the lexicographical rank of any other event preceding it in the
+lexicographical order of the `event-streams-offset` of any event in the log MUST
+be greater than the lexicographical order of any other event preceding it in the
 order of the log.
 
 Receivers learn about offset values either by obtaining the runtime information
@@ -341,13 +556,13 @@ of a partition, which contains the offset of the most recently added event, or
 by retaining the value of the last `event-streams-offset` delivery annotation
 property they read from the partition.
 
-For use with [delivery filter expressions](#222-delivery-filters), the reserved
+For use with [delivery filter expressions](#52-delivery-filters), the reserved
 values MAY be used as constants for comparand values:
 
 - "@earliest" is smaller than all existing offsets in the log.
 - "@latest" is greater than all existing offsets in the log.
 
-# 2.2.1.2 event-streams-timestamp
+### 5.1.2 event-streams-timestamp
 
 The `event-streams-timestamp` delivery annotation property is a timestamp
 expression and reflects the absolute UTC instant when the event has been added
@@ -365,7 +580,7 @@ record `event-streams-timestamp` values that reflect the existing clock skew,
 meaning that some events that appear later in the log than a given event might
 yet carry earlier UTC timestamps.
 
-# 2.2.2 Delivery filters
+## 5.2 Delivery filters
 
 A delivery filter specifies which events are eligible for delivery from the
 event log. The delivery filter is provided as a source filter during link
@@ -381,15 +596,15 @@ The source filter MUST be evaluated against the retained events in the log from
 earliest to latest. Events matching the source expression are eligible for
 delivery.
 
-# 2.2.2.1 event-streams-delivery-annotations filter
+### 5.2.1 event-streams-delivery-annotations filter
 
 The `event-streams-delivery-annotations` filter type applies to AMQP
 delivery annotations section (AMQP 3.2.2). The filter evaluates to true if all
 annotations enclosed in the filter expression match the respective
-delivery annotation map entries in the message.
+delivery annotation map entries.
 
-Only the [`event-streams-offset`](#2211-event-streams-offset) and/or
-[`event-streams-timestamp`](#2212-event-streams-timestamp) delivery annotation
+Only the [`event-streams-offset`](#511-event-streams-offset) and/or
+[`event-streams-timestamp`](#512-event-streams-timestamp) delivery annotation
 properties are eligible to be used with this filter.
 
 The property values match the given values in the filter expression, if the value
@@ -404,7 +619,7 @@ of the property is greater or equal to the value given in the filter expression.
 The filter-type is “amqp:event-streams-delivery-annotations-filter”, with
 type-code 0x00000000:0x00000200
 
-# 2.2.2.2 event-streams-sql filter 
+### 5.2.2 event-streams-sql filter 
 
 The event streams SQL filter expression is a constrained subset of the SQL filter
 expression defined in [AMQP filter expressions [FILTEX, 6]](#filtex-v10).
@@ -420,7 +635,7 @@ expression ::= <constant> | <field_value>
 constant   ::= <string_constant> | <integer_constant>
 field_value := <field>
 field ::= <section> ’.’<field_name>
-section ::= { ‘message_annotations’ | ‘m’ }
+section ::= { ‘delivery_annotations’ | ‘d’ }
 ```
 
 This grammar subset allows for a minimal implementation that is limited to
@@ -429,9 +644,9 @@ interoperable with the full SQL filter syntax.
 
 Examples:
 
-- Start from event at offset "a4c5" exclusively: `m.event-streams-offset > '100'`
-- Start from event at offset "a4c5" inclusively: `m.event-streams-offset >= '100'`
-- Start from event received after the timestamp: `m.event-streams-timestamp > 1585672841`
+- Start from event at offset "a4c5" exclusively: `d.event-streams-offset > 'a4c5'`
+- Start from event at offset "a4c5" inclusively: `d.event-streams-offset >= 'a4c5'`
+- Start from event received after the timestamp: `d.event-streams-timestamp > 1585672841`
 
 
 ``` XML
@@ -443,60 +658,11 @@ Examples:
 The filter-type is “amqp:event-streams-sql-filter”, with type-code 0x00000000:0x00000201
 
 
-## 2.3 Link ownership
 
-An implementation MAY constrain the number of concurrent receivers that can
-receive from a log or its partitions.
-
-In scenarios where a group of multiple concurrent event processors want to
-receive events from a partitioned event log and where they use an external
-consensus mechanism to agree on which event processor owns which partition, it
-is desireable to restrict each partition to one (the owning) receiver from the
-group and for event processors to "steal" ownership of the partition as
-assignments amongst the group change.
-
-This specification does not prescribe any algorithm or strategy for reaching
-such consensus, but only a mechanism for realizing its outcome:
-
-For an event log that is partitioned, a link MAY be associated with a partition
-and a consumer group when the respective link properties are provided during
-`attach`. For the combination of partition and consumer group, the node
-maintains a `long`-valued `epoch` counter, which is seeded with zero and
-returned in the `event-streams-epoch` link property to the receiver during a
-successful attempt to attach.
-
-Any subsequent attempt to attach a link with the same combination of partition
-and consumer group link property values will be rejected while there is an
-active link and unless the newly attaching receiver provides an epoch counter
-greater than the current epoch counter value using the `event-streams-epoch`
-link property. If that condition is true, the new epoch counter value is
-recorded, any existing link for the given partition and consumer group is closed
-by the node, and the new link is attached.
-
-Whenever the link for a partition within a group is closed by the receiver and
-therefore no links remain, the respective epoch counter is reset to zero.  
-
-### 2.2.1 event-streams-consumer-group link property
-
-The `event-streams-consumer-group` link property is a `string` value that
-identifies a group of consumers and provides a scope for the epoch counter.
-
-An implementation MAY require for the group identifier to correspond to a
-configured item on the event stream engine and otherwise refuse to attach the
-link.
-
-### 2.2.1 event-streams-epoch link property
-
-The `event-streams-epoch` link property is a `long` integer value and describes
-the ownership epoch for the link relative to the consumer group and while at
-least one link is attached to the partition within the given consumer group.
-
-If no link is attached to node for the given partition and group, the epoch
-counter SHOULD be reset to zero.
 
 -------
 
-# 3 Runtime Information
+# 6 Runtime Information
 
 TBD.
 
@@ -505,13 +671,13 @@ TBD.
 
 -------
 
-# 4 Safety, Security, and Data Protection Considerations
+# 7 Safety, Security, and Data Protection Considerations
 
 [[TBD]]
 
 -------
 
-# 5 Conformance
+# 8 Conformance
 
 [[TBD]]
 
@@ -532,16 +698,13 @@ specification and are gratefully acknowledged:
 **AMQP TC Members:**
 
 | First Name | Last Name | Company |
-| :--- | :--- | :--- |
-Philippe | Alman | Something Networks
-Alex | Amirnovman | Company B
-Kris | Anderman | Mini Micro
-Darren | Anstman | Big Networks
+| :--------- | :-------- | :------ |
+| TBD        | TBD       | TBD     |
 
 -------
 
 # Appendix B. Revision History
-| Revision | Date | Editor | Changes Made |
-| :--- | :--- | :--- | :--- |
-| specname-v1.0-wd01 | yyyy-mm-dd | Editor Name | Initial working draft |
+| Revision                | Date       | Editor          | Changes Made          |
+| :---------------------- | :--------- | :-------------- | :-------------------- |
+| event-streams-v1.0-wd01 | 2020-06-22 | Clemens Vasters | Initial working draft |
 
