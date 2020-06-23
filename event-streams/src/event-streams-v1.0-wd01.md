@@ -225,7 +225,7 @@ Rescorla, E. and B. Korver, "Guidelines for Writing RFC Text on Security
 Considerations", BCP 72, RFC 3552, DOI 10.17487/RFC3552, July 2003,
 https://www.rfc-editor.org/info/rfc3552.
 
-# 2 Terminology
+# 2 Definitions
 
 The following terminology is used in this specification to clarify roles. These
 definitions are narrower than their use in the core AMQP specification.
@@ -265,7 +265,7 @@ behaviors defined here are optional, which means that a producer or consumer
 MUST be able to successfully interact with a conforming event log implementation
 just as with any regular AMQP node, for instance:
 
-* Producer and consumers that do not choose a partition on a partitioned event
+* Producers and consumers that do not choose a partition on a partitioned event
   log are either assigned a partition by the event log node, or their links are
   left partition-agnostic.
 * Producers are not required to annotate events with partition hints, even on
@@ -307,9 +307,9 @@ The model composes with AMQP link-level redirects as defined in [AMQP 1.0,
 attach a link, but rather point to a different AMQP container where the
 requested or assigned partition is available.
 
-If the event log assigns a partition-bound links and wants to renegotiate those
-assignments, it MAY gracefully close some or all attached links and the
-respective producer or consumer SHOULD then attempt to establish a new link.
+If the event log assigns partition-bound links and wants to renegotiate those
+assignments, it MAY close some or all attached links and the respective producer
+or consumer SHOULD then attempt to establish a new link.
 
 The binding of a producer or consumer to a partition MAY be negotiated using link
 properties when the link is being attached. A consumer or producer MAY request
@@ -386,10 +386,10 @@ value. Otherwise, the transfer MUST be rejected.
 In scenarios where a group of multiple concurrent event consumers want to
 receive mutually exclusive subsets of events from a partitioned event log, it is
 desireable to restrict each partition to one (the "owning") receiver from the
-group and for event consumers to shift ownership of the partition dynamically.
+group, and for event consumers to shift ownership of the partition dynamically.
 Consumers might also want to use an external consensus mechanism to agree on
-which event processor owns which partition rather than have the event log engine
-be in the loop.
+which event processor owns which partition, rather than have the event log
+engine coordinate the assignments.  
 
 This specification does not prescribe any algorithm or strategy for reaching
 consensus on ownership of partitions amongst a group of consumers, but it
@@ -404,8 +404,8 @@ for there to be a such named pre-configured entity inside of event log node, in
 which case attaching the link MAY fail if such an entity does not exist.
 
 The event log node MUST NOT assign a consumer group if the consumer does not
-request such a binding. Links that are bound to consumer groups MUST also be
-bound to a partition; they cannot be partition-agile.
+request such a binding. Negotiated links that are bound to consumer groups MUST
+also be bound to a partition; they cannot be partition-agile.
 
 The selection and binding of a partition to the consumer within a given consumer
 group follows the negotiation model explained earlier in this section.
@@ -416,7 +416,7 @@ active 'receive' link for each combination of partition and consumer group.
 ### 4.5.1 Event log node-assigned partition ownership
 
 If the event log node wants to force renegotiation of partition assignments
-amongst a consumer group, it SHOULD gracefully close all affected links and the
+amongst a consumer group, it needs to close all affected links and the
 respective consumers SHOULD attempt to establish a new link to request or
 receive new assignments.
 
