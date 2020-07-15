@@ -111,8 +111,9 @@ Remove this note before submitting for publication.)
 _OASIS Advanced Message Queuing Protocol (AMQP) Version 1.0 Part 0: Overview_. Edited by Robert Godfrey, David Ingham, and Rafael Schloming. Latest version: http://docs.oasis-open.org/amqp/core/v1.0/amqp-core-overview-v1.0.html.
 ###### [RFC2119]
 Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, http://www.rfc-editor.org/info/rfc2119.
-###### [RFC2616]
-Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext Transfer Protocol -- HTTP/1.1", RFC 2616, DOI 10.17487/RFC2616, June 1999, <https://www.rfc-editor.org/info/rfc2616>.
+###### [RFC7231]
+Fielding, R., Ed., and J. Reschke, Ed., "Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI 10.17487/RFC7231, June 2014, https://www.rfc- editor.org/info/rfc7231.
+
 ###### [RFC8174]
 Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174, May 2017, http://www.rfc-editor.org/info/rfc8174.
 
@@ -169,17 +170,7 @@ environment to its partner.
 `<type name="product-string" class="restricted" source="string"/>`
 
 The content of the `product-string` MUST adopt the content structure of the `User-Agent` header (defined by 
-[[RFC2616](#rfc2616)]) and commonly implemented by Web Browsing software. The field MAY contain multiple product tokens
-and comments identifying the product and any sub-products which form a significant part of the system. By convention, 
-the product tokens SHOULD be listed in order of their significance
-
-Formally, the content of `product-string` MUST conform to this ABNF production rule:
- 
-```
-product-string = 1*( product | comment ) 
-```
-
-where symbols `product`, `comment`, and the ABNF grammar itself are as defined by [[RFC2616](#rfc2616)].
+[[RFC7321](#rfc7321)]) and commonly implemented by Web Browsing software.
 
 ## Non normative examples:
 
