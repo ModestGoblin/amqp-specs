@@ -142,8 +142,10 @@ field of the AMQP `open` performative [[AMQP-v1.0](#AMQP-v1.0)]. The key of the 
 `connection-info`. The value of the entry MUST be of type `fields`.
 
 The following key values have defined meaning. An implementation MAY choose to omit a key from the map.
-An implementation MAY also include keys of its own. If an implementation receives a key from its partner
-that it does not recognise, it SHOULD ignore it.
+An implementation MAY also include keys of its own.
+
+The receiving partner SHOULD NOT ascribe any semantics to a key not defined by this specification or its
+value, and the sender partner MUST NOT expect a receiver to ascribe any semantics to such a key.
 
 # 3.1 connection-info
 
