@@ -169,7 +169,7 @@ environment to its partner.
 The content of the `product-string` MUST adopt the content structure of the `User-Agent` header (defined by 
 [[RFC2616](#rfc2616)]) and commonly implemented by Web Browsing software. The field MAY contain multiple product tokens
 and comments identifying the product and any sub-products which form a significant part of the system. By convention, 
-the product tokens are listed in order of their significance
+the product tokens SHOULD be listed in order of their significance
 
 Formally, the content of `product-string` MUST conform to this ABNF production rule:
  
