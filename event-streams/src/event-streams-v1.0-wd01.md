@@ -225,7 +225,7 @@ Rescorla, E. and B. Korver, "Guidelines for Writing RFC Text on Security
 Considerations", BCP 72, RFC 3552, DOI 10.17487/RFC3552, July 2003,
 https://www.rfc-editor.org/info/rfc3552.
 
-# 2 Terminology
+# 2 Definitions
 
 The following terminology is used in this specification to clarify roles. These
 definitions are narrower than their use in the core AMQP specification.
@@ -265,7 +265,7 @@ behaviors defined here are optional, which means that a producer or consumer
 MUST be able to successfully interact with a conforming event log implementation
 just as with any regular AMQP node, for instance:
 
-* Producer and consumers that do not choose a partition on a partitioned event
+* Producers and consumers that do not choose a partition on a partitioned event
   log are either assigned a partition by the event log node, or their links are
   left partition-agnostic.
 * Producers are not required to annotate events with partition hints, even on
@@ -393,10 +393,10 @@ value. Otherwise, the transfer MUST be rejected.
 In scenarios where a group of multiple concurrent event consumers want to
 receive mutually exclusive subsets of events from a partitioned event log, it is
 desireable to restrict each partition to one (the "owning") receiver from the
-group and for event consumers to shift ownership of the partition dynamically.
+group, and for event consumers to shift ownership of the partition dynamically.
 Consumers might also want to use an external consensus mechanism to agree on
-which event processor owns which partition rather than have the event log engine
-be in the loop.
+which event processor owns which partition, rather than have the event log
+engine coordinate the assignments.  
 
 This specification does not prescribe any algorithm or strategy for reaching
 consensus on ownership of partitions amongst a group of consumers, but it
