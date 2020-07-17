@@ -291,7 +291,7 @@ each responsible for one or more partitions of the event log.
 
 Producers and consumers attach to the event log via AMQP links. Those links MAY
 be bound to one, specific partition (partition-bound) or they MAY be
-partition-agnostic. On partition-agnostic links, producers MAY provider
+partition-agnostic. On partition-agnostic links, producers MAY provide
 transfer-level hints for which partition the transfer ought to be routed to.
 
 This model allows for a range of negotiation options for how consumers are
@@ -307,9 +307,16 @@ The model composes with AMQP link-level redirects as defined in [AMQP 1.0,
 attach a link, but rather point to a different AMQP container where the
 requested or assigned partition is available.
 
-If the event log assigns a partition-bound links and wants to renegotiate those
-assignments, it MAY gracefully close some or all attached links and the
-respective producer or consumer SHOULD then attempt to establish a new link.
+If the event log assigns partition-bound links to consumers and wants to
+renegotiate those assignments, it MAY gracefully close some or all attached
+links and the respective producer or consumer SHOULD then attempt to establish a
+new link.
+
+Whether the event log node assigns partition-bound or partition-agnostic links
+MAY be a configurable implementation choice. Partition-bound links provide the
+consumer with the assurance that all transfers belong to the given partition,
+which is desireable when the partitioning model extends into resources beyond
+the event log.
 
 The binding of a producer or consumer to a partition MAY be negotiated using link
 properties when the link is being attached. A consumer or producer MAY request
@@ -405,7 +412,7 @@ which case attaching the link MAY fail if such an entity does not exist.
 
 The event log node MUST NOT assign a consumer group if the consumer does not
 request such a binding. Links that are bound to consumer groups MUST also be
-bound to a partition; they cannot be partition-agile.
+bound to a partition; they cannot be partition-agnostic.
 
 The selection and binding of a partition to the consumer within a given consumer
 group follows the negotiation model explained earlier in this section.
@@ -415,10 +422,28 @@ active 'receive' link for each combination of partition and consumer group.
 
 ### 4.5.1 Event log node-assigned partition ownership
 
-If the event log node wants to force renegotiation of partition assignments
-amongst a consumer group, it SHOULD gracefully close all affected links and the
-respective consumers SHOULD attempt to establish a new link to request or
-receive new assignments.
+If the consumer attaches a link scoped to a consumer group without specifying a
+partition, the event log node MAY bind a partition to the link as described in
+[4.3](#43-binding-consumer-links).
+
+If the event log node manages 10 partitions and there are 12 candidate consumers
+trying to establish links, 2 of those consumers might be denied access with a
+`detach-forced` error since there are no partitions left to assign. Once a
+partition-bound link closes, the respective partition is again available for
+assignment. If all partitions are assigned, the event log node MAY choose not to
+deny attaching the link outright, but keep further incoming attach requests
+pending and complete those only once a partition becomes available for
+assignment. 
+
+If the event log node later wants to force renegotiation of partition bindings
+amongst a consumer group, it SHOULD gracefully close all partition-bound links
+and the respective consumers SHOULD attempt to establish a new link, again
+without specifying a partition.
+
+The event log node MAY also attach consumer group links without binding them to
+a specific partition, allowing for multiple partitions to be associated with a
+link and for those binding to change dynamically without having to reestablish
+the link.
 
 ### 4.5.2 Consumer-negotiated partition ownership
 
@@ -666,8 +691,10 @@ The filter-type is “amqp:event-streams-sql-filter”, with type-code 0x0000000
 
 TBD.
 
->This section will describe a request/response operation to acquire information
->about the available partitions and offsets. 
+> This section will describe a request/response operation to acquire information
+> about the available partitions and offsets. 
+
+
 
 -------
 
