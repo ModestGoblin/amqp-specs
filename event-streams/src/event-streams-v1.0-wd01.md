@@ -181,6 +181,16 @@ Event stream engines conforming to this specification MAY implement any of the
 capabilities defined here and they MUST implement the default behaviors defined
 here when those capabilities are not explicitly used.
 
+It is not in scope for this specification to define how an event stream consumer
+might handle persistence and failover of initial stream offsets that the
+consumer wants to track across multiple interactions with the event stream log.
+Once an AMQP link is established with an initial offset, the event log node's
+AMQP link terminus will keep track of the consumer offsets and delivery state
+while the link is active. Each message delivered to a consumer carries a
+delivery annotation (`event-streams-offset`) that the consumer can hold on to
+and use as the initial offset for a new link when it wants to resume suspended
+processing. 
+
 ## 1.1 IPR Policy
 This specification is provided under the [RF on
 RAND](https://www.oasis-open.org/policies-guidelines/ipr#RF-on-RAND-Mode) Mode
@@ -632,8 +642,10 @@ Only the [`event-streams-offset`](#511-event-streams-offset) and/or
 [`event-streams-timestamp`](#512-event-streams-timestamp) delivery annotation
 properties are eligible to be used with this filter.
 
-The property values match the given values in the filter expression, if the value
-of the property is greater or equal to the value given in the filter expression.
+The property values match the given values in the filter expression, if the
+value of the property is greater than value given in the filter expression. If
+the application remembered a particular offset after having consumed the message
+that carried it, the filter matches messages added after that offset.
 
 ``` XML
 <type name="event-streams-delivery-annotations-filter" class="restricted" source="amqp:map" provides="filter">
@@ -683,17 +695,42 @@ Examples:
 The filter-type is “amqp:event-streams-sql-filter”, with type-code 0x00000000:0x00000201
 
 
-
-
 -------
 
 # 6 Runtime Information
 
-TBD.
+Each event log node MUST implement a special, subordinate source address named
+`$info` that allows producers and consumers to obtain information about the
+configuration and state of the event log, most importantly the current number of
+partitions and the offset boundaries for each partition.
 
-> This section will describe a request/response operation to acquire information
-> about the available partitions and offsets. 
+If the container-relative source address of an event log node is "example", the
+information source address MUST be "example/$info".
 
+To obtain information from the information source, the producer or consumer
+opens a receive link and flows at least one unit of link credit. The information
+source responds with transferring a message that contains the desired
+information in its `amqp-value` section. If multiple link credits are granted, the
+information source MAY choose to put reasonable, application-defined temporal
+separation between transfers.
+
+The `amqp-value` section of the message contains an AMQP `map` at the top level.
+The map has one reserved entry with the key `partitions`, all other entries MAY
+be used for application specific extensions.
+
+The `partitions` entry's value is a `list`, with one entry for each partition.
+The list MUST carry an entry for the "main partition" if the log is
+unpartitioned.
+
+The entries in the partitions list are `map` objects and MUST contain the
+following reserved entries for each partition; all other entries MAY
+be used for application specific extensions.
+
+|  Key            | Type    | Description
+|-----------------|---------|------------------------------------------------------
+| partition       | symbol  | The opaque identifier of the partition
+| earliest-offset | symbol  | The earliest retained offset in the partition. MAY be null.
+| latest-offset   | symbol  | The latest retained offset in the partition. MAY be null.
 
 
 -------
