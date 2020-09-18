@@ -1,4 +1,3 @@
-
 ![OASIS Logo](http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg)
 -------
 
@@ -136,24 +135,31 @@ servers, or containers supporting a peer-to-peer scenario.
 
 -------
 
-# 3 Definitions
+# 3 Connection Information
 
-An AMQP host that implements this specification MUST provide the following entry in the properties
-field of the AMQP `open` performative [[AMQP-v1.0](#AMQP-v1.0)]. The key of the entry MUST be the symbol
-`connection-info`. The value of the entry MUST be of type `fields`.
+## 3.1 Connection Capabilities
 
-The following key values have defined meaning. An implementation MAY choose to omit a key from the map.
-An implementation MAY also include keys of its own.
+An AMQP host that implements this specification MUST indicate this by including `conninfo` in the
+`offered-capabilities` field of the `open` performative [[AMQP-v1.0](#AMQP-v1.0)].  
+
+## 3.2 Connection Properties
+
+An AMQP host that implements this specification MUST include `connection-info` in the properties
+field of the AMQP `open` performative [[AMQP-v1.0](#AMQP-v1.0)]. The content of this property allows
+the container to provide information about itself and its operating environment to its partner.
+
+The key of the entry MUST be the symbol `connection-info`. The value of the entry MUST be of type `fields`.
+The XML notation for this type is:
+
+`<type name="connection-info" class="restricted" source="fields"/>`
+
+The following key values described in the next sub-section below have defined meaning. An implementation MAY choose
+to omit a key from the map. An implementation MAY also include keys of its own.
 
 The receiving partner SHOULD NOT ascribe any semantics to a key not defined by this specification or its
 value, and the sender partner MUST NOT expect a receiver to ascribe any semantics to such a key.
 
-# 3.1 connection-info
-
-`<type name="connection-info" class="restricted" source="fields"/>`
-
-The content of `connection-info` allows the container to provide information about itself and its operating
-environment to its partner.
+# 3.2.1 connection-info
 
 **Table 1-1. connection-info**
 
@@ -161,16 +167,18 @@ environment to its partner.
 | :--- | :--- |
 | `process-identifier` | The value of the process-identifier MUST be an AMQP string. The purpose of the value is to identify the process running this AMQP host. It is RECOMMENDED that this is an operating system PID. |
 | `network-host` | The value of network-host MUST be an AMQP string. The purpose of the value is to identify the host running the AMQP container in a way that assists those fault finding within a system. This value MAY be a hostname, fully qualified hostname or IP address. The value MAY be network resolvable by the AMQP peer but the peer MUST NOT rely on this. |
-| `amqp-product` | The value of amqp-product MUST be an AMQP string and is a `product-string`. It provides details of the software product(s) that provide the AMQP implementation. It MAY identify multiple products. By convention, the products are listed in order of their significance for identifying the product. |
-| `product` | The value of product MUST be an AMQP string and is a product-string. It provides details of the software product(s) that is the end-user application. It MAY identify multiple products. By convention, the products are listed in order of their significance for identifying the application. |
-| `platform` | The value of platform MUST be an AMQP string and is a product-string. It exists to expose details of a product’s runtime platform. This typically identify the operating system, Java/.NET runtimes etc. It MAY identify multiple products. By convention, the products are listed in order of their significance. |
+| `amqp-component` | The value of `amqp-component` MUST be an AMQP string and is a `product-string`. It provides details of the software components(s) that provide the AMQP implementation. It MAY identify multiple components. By convention, the components are listed in order of their significance. |
+| `application` | The value of `application` MUST be an AMQP string and is a `product-string`. It provides details of the software application(s) that make use of the AMQP components. It MAY identify multiple applications. By convention, the applications are listed in order of their significance. |
+| `platform` | The value of platform MUST be an AMQP string and is a `product-string`. It exists to expose details of the application’s runtime platform. This typically identifies the operating system, Java/.NET runtimes etc. It MAY identify multiple platforms. By convention, the platforms are listed in order of their significance. |
 
-# 3.2 product-string
+# 3.2.1 product-string
+
+The XML notation for this type is:
 
 `<type name="product-string" class="restricted" source="string"/>`
 
 The content of the `product-string` MUST adopt the content structure of the `User-Agent` header (defined by 
-[[RFC7321](#rfc7321)]) and commonly implemented by Web Browsing software.
+[[RFC7321](#rfc7321)]) which is commonly implemented by Web Browsing software.
 
 ## Non normative examples:
 
