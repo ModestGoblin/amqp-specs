@@ -372,9 +372,9 @@ property to the bound partition.
 
 If a `send` link is partition-agnostic, the sender MAY provide partition-related
 hints to the `event log node` with the
-[`event-streams-target-partition`](#465-event-streams-target-partition-delivery-annotation)
+[`event-streams-target-partition`](#466-event-streams-target-partition-delivery-annotation)
 delivery annotation or the
-[`event-streams-group-key`](#466-event-streams-group-key-message-annotation)
+[`event-streams-group-key`](#467-event-streams-group-key-message-annotation)
 message annotation.
 
 If the `event-streams-target-partition` delivery annotation is added to a
@@ -546,7 +546,7 @@ event log node before delivery to consumers.
 
 A consumer MUST strip the annotation if it forwards the message onwards.
 
-#### 4.6.4 event-streams-associated-partitions-changed delivery annotation
+#### 4.6.5 event-streams-associated-partitions-changed delivery annotation
 
 The `event-streams-assigned-partitions-changed` delivery annotation is an array
 of `symbol` values and contains the list of partitions associated with the link
@@ -558,7 +558,7 @@ partitions with the link has changed.
 
 A consumer MUST strip the annotation if it forwards the message onwards.
 
-#### 4.6.5 event-streams-target-partition delivery annotation
+#### 4.6.6 event-streams-target-partition delivery annotation
 
 The `event-streams-target-partition` delivery annotation is a `symbol` value and
 describes the partition to which the transfer MUST be routed.
@@ -569,7 +569,7 @@ the transfer MUST be rejected.
 
 The event log MUST strip the annotation once it has evaluated it.
 
-#### 4.6.6 event-streams-group-key message annotation
+#### 4.6.7 event-streams-group-key message annotation
 
 The `event-streams-group-key` message annotation is a `string` value and is a grouping
 key that identifies events that are related and SHOULD therefore be treated as a

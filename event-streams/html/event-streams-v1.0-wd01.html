@@ -135,9 +135,9 @@
 <li><a href="#463-event-streams-epoch-link-property">4.6.3 event-streams-epoch link property</a>
 <ul>
 <li><a href="#464-event-streams-source-partition-delivery-annotation">4.6.4 event-streams-source-partition delivery annotation</a></li>
-<li><a href="#464-event-streams-associated-partitions-changed-delivery-annotation">4.6.4 event-streams-associated-partitions-changed delivery annotation</a></li>
-<li><a href="#465-event-streams-target-partition-delivery-annotation">4.6.5 event-streams-target-partition delivery annotation</a></li>
-<li><a href="#466-event-streams-group-key-message-annotation">4.6.6 event-streams-group-key message annotation</a></li>
+<li><a href="#465-event-streams-associated-partitions-changed-delivery-annotation">4.6.5 event-streams-associated-partitions-changed delivery annotation</a></li>
+<li><a href="#466-event-streams-target-partition-delivery-annotation">4.6.6 event-streams-target-partition delivery annotation</a></li>
+<li><a href="#467-event-streams-group-key-message-annotation">4.6.7 event-streams-group-key message annotation</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -291,7 +291,7 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <p>The event log node MAY bind the link a partition when none has been requested by the producer.</p>
 <p>If the link becomes partition-bound, the event log node MUST set the <a href="#461-event-streams-partition-link-property"><code>event-streams-partition</code></a> link property to the bound partition.</p>
 <h2 id="42-partition-annotations-in-producer-transfers">4.2 Partition annotations in producer transfers</h2>
-<p>If a <code>send</code> link is partition-agnostic, the sender MAY provide partition-related hints to the <code>event log node</code> with the <a href="#465-event-streams-target-partition-delivery-annotation"><code>event-streams-target-partition</code></a> delivery annotation or the <a href="#466-event-streams-group-key-message-annotation"><code>event-streams-group-key</code></a> message annotation.</p>
+<p>If a <code>send</code> link is partition-agnostic, the sender MAY provide partition-related hints to the <code>event log node</code> with the <a href="#466-event-streams-target-partition-delivery-annotation"><code>event-streams-target-partition</code></a> delivery annotation or the <a href="#467-event-streams-group-key-message-annotation"><code>event-streams-group-key</code></a> message annotation.</p>
 <p>If the <code>event-streams-target-partition</code> delivery annotation is added to a transfer on a partition-bound link, its value MUST match the <code>event-streams-partition</code> link property's value. Otherwise, the transfer MUST be rejected.</p>
 <h2 id="43-binding-consumer-links">4.3 Binding Consumer Links</h2>
 <p>A consumer MAY request for the 'receive' link to be bound to a specific partition using the <a href="#461-event-streams-partition-link-property"><code>event-streams-partition</code></a> link property.</p>
@@ -342,15 +342,15 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <p>The <code>event-streams-source-partition</code> delivery annotation is a <code>symbol</code> value and describes the partition from which partition the transfer originates.</p>
 <p>If the event log is partitioned, the delivery annotation MUST be added by the event log node before delivery to consumers.</p>
 <p>A consumer MUST strip the annotation if it forwards the message onwards.</p>
-<h4 id="464-event-streams-associated-partitions-changed-delivery-annotation">4.6.4 event-streams-associated-partitions-changed delivery annotation</h4>
+<h4 id="465-event-streams-associated-partitions-changed-delivery-annotation">4.6.5 event-streams-associated-partitions-changed delivery annotation</h4>
 <p>The <code>event-streams-assigned-partitions-changed</code> delivery annotation is an array of <code>symbol</code> values and contains the list of partitions associated with the link that the transfer is being carried over.</p>
 <p>For all partition-agnostic consumer links, the event log node SHOULD add this annotation to the next transfer to the consumer once the association of partitions with the link has changed.</p>
 <p>A consumer MUST strip the annotation if it forwards the message onwards.</p>
-<h4 id="465-event-streams-target-partition-delivery-annotation">4.6.5 event-streams-target-partition delivery annotation</h4>
+<h4 id="466-event-streams-target-partition-delivery-annotation">4.6.6 event-streams-target-partition delivery annotation</h4>
 <p>The <code>event-streams-target-partition</code> delivery annotation is a <code>symbol</code> value and describes the partition to which the transfer MUST be routed.</p>
 <p>If the link is not partition-agnostic and if the link is not bound to the exact same partition, the transfer MUST be rejected. If the partition does not exist, the transfer MUST be rejected.</p>
 <p>The event log MUST strip the annotation once it has evaluated it.</p>
-<h4 id="466-event-streams-group-key-message-annotation">4.6.6 event-streams-group-key message annotation</h4>
+<h4 id="467-event-streams-group-key-message-annotation">4.6.7 event-streams-group-key message annotation</h4>
 <p>The <code>event-streams-group-key</code> message annotation is a <code>string</code> value and is a grouping key that identifies events that are related and SHOULD therefore be treated as a group for partitioning purposes.</p>
 <p>This value differs from the AMQP core message property <code>group-id</code> in being an annotation and therefore allowing overrides as messages get routed through multiple partitioned intermediaries where partitioning concerns and therefore the choice of grouping keys might vary.</p>
 <p>When set by the producer and used over a partition-agnostic link, the value of the annotation MAY be used by the event log node to bind the transfer to a partition. If the key is used in this way, the event log SHOULD bind transfers with the key to the same partition at all times and until the number of partitions changes.</p>
