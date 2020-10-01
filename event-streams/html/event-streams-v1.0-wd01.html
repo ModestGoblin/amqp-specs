@@ -5,87 +5,93 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>Event Stream Extensions for AMQP Version 1.0</title>
-  <style type="text/css">
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      span.underline{text-decoration: underline;}
-      div.column{display: inline-block; vertical-align: top; width: 50%;}
-  </style>
-  <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="styles/markdown-styles-v1.7.3.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
 <h1 class="title">Event Stream Extensions for AMQP Version 1.0</h1>
 </header>
-<nav id="TOC">
+<nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#oasis-logo"><img src="http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg" alt="OASIS Logo" /></a></li>
-<li><a href="#event-stream-extensions-for-amqp-version-10">Event Stream Extensions for AMQP Version 1.0</a><ul>
-<li><a href="#working-draft-01">Working Draft 01</a></li>
-<li><a href="#22-june-2020">22 June 2020</a><ul>
+<li><a href="#event-stream-extensions-for-amqp-version-10">Event Stream Extensions for AMQP Version 1.0</a>
+<ul>
+<li><a href="#working-draft-02">Working Draft 02</a></li>
+<li><a href="#1-october-2020">1 October 2020</a>
+<ul>
 <li><a href="#technical-committee">Technical Committee:</a></li>
 <li><a href="#chairs">Chairs:</a></li>
 <li><a href="#editor">Editor:</a></li>
@@ -98,42 +104,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#notices">Notices</a></li>
 </ul></li>
 <li><a href="#table-of-contents">Table of Contents</a></li>
-<li><a href="#1-introduction">1 Introduction</a><ul>
+<li><a href="#1-introduction">1 Introduction</a>
+<ul>
 <li><a href="#11-ipr-policy">1.1 IPR Policy</a></li>
 <li><a href="#12-terminology">1.2 Terminology</a></li>
 <li><a href="#13-normative-references">1.3 Normative References</a></li>
 <li><a href="#14-non-normative-references">1.4 Non-Normative References</a></li>
 </ul></li>
 <li><a href="#2-definitions">2 Definitions</a></li>
-<li><a href="#3-capabilities-and-default-behaviors">3 Capabilities and Default Behaviors</a><ul>
-<li><a href="#31-connection-and-link-capabilities">3.1 Connection and Link Capabilities</a></li>
+<li><a href="#3-capabilities-and-default-behaviors">3 Capabilities and Default Behaviors</a>
+<ul>
+<li><a href="#31-connection-capability">3.1 Connection Capability</a></li>
 <li><a href="#32-default-behaviors">3.2 Default Behaviors</a></li>
 </ul></li>
-<li><a href="#4-partition-support">4 Partition support</a><ul>
+<li><a href="#4-partition-support">4 Partition support</a>
+<ul>
 <li><a href="#41-binding-producer-links">4.1 Binding producer links</a></li>
 <li><a href="#42-partition-annotations-in-producer-transfers">4.2 Partition annotations in producer transfers</a></li>
 <li><a href="#43-binding-consumer-links">4.3 Binding Consumer Links</a></li>
 <li><a href="#44-partition-annotations-in-consumer-transfers">4.4 Partition annotations in consumer transfers</a></li>
-<li><a href="#45-consumer-groups">4.5 Consumer groups</a><ul>
+<li><a href="#45-consumer-groups">4.5 Consumer groups</a>
+<ul>
 <li><a href="#451-event-log-node-assigned-partition-ownership">4.5.1 Event log node-assigned partition ownership</a></li>
 <li><a href="#452-consumer-negotiated-partition-ownership">4.5.2 Consumer-negotiated partition ownership</a></li>
-<li><a href="#46-property-definitions">4.6. Property definitions</a><ul>
+<li><a href="#46-property-definitions">4.6. Property definitions</a>
+<ul>
 <li><a href="#461-event-streams-partition-link-property">4.6.1 event-streams-partition link property</a></li>
 </ul></li>
 <li><a href="#462-event-streams-consumer-group-link-property">4.6.2 event-streams-consumer-group link property</a></li>
-<li><a href="#463-event-streams-epoch-link-property">4.6.3 event-streams-epoch link property</a><ul>
+<li><a href="#463-event-streams-epoch-link-property">4.6.3 event-streams-epoch link property</a>
+<ul>
 <li><a href="#464-event-streams-source-partition-delivery-annotation">4.6.4 event-streams-source-partition delivery annotation</a></li>
+<li><a href="#464-event-streams-associated-partitions-changed-delivery-annotation">4.6.4 event-streams-associated-partitions-changed delivery annotation</a></li>
 <li><a href="#465-event-streams-target-partition-delivery-annotation">4.6.5 event-streams-target-partition delivery annotation</a></li>
 <li><a href="#466-event-streams-group-key-message-annotation">4.6.6 event-streams-group-key message annotation</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
-<li><a href="#5-stream-delivery-offsets-and-filters">5 Stream delivery offsets and filters</a><ul>
-<li><a href="#51-delivery-annotations">5.1 Delivery annotations</a><ul>
+<li><a href="#5-stream-delivery-offsets-and-filters">5 Stream delivery offsets and filters</a>
+<ul>
+<li><a href="#51-delivery-annotations">5.1 Delivery annotations</a>
+<ul>
 <li><a href="#511-event-streams-offset">5.1.1 event-streams-offset</a></li>
 <li><a href="#512-event-streams-timestamp">5.1.2 event-streams-timestamp</a></li>
 </ul></li>
-<li><a href="#52-delivery-filters">5.2 Delivery filters</a><ul>
+<li><a href="#52-delivery-filters">5.2 Delivery filters</a>
+<ul>
 <li><a href="#521-event-streams-delivery-annotations-filter">5.2.1 event-streams-delivery-annotations filter</a></li>
 <li><a href="#522-event-streams-sql-filter">5.2.2 event-streams-sql filter</a></li>
 </ul></li>
@@ -147,8 +163,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </nav>
 <h2 id="oasis-logo"><img src="http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg" alt="OASIS Logo" /></h2>
 <h1 id="event-stream-extensions-for-amqp-version-10">Event Stream Extensions for AMQP Version 1.0</h1>
-<h2 id="working-draft-01">Working Draft 01</h2>
-<h2 id="22-june-2020">22 June 2020</h2>
+<h2 id="working-draft-02">Working Draft 02</h2>
+<h2 id="1-october-2020">1 October 2020</h2>
 <h4 id="technical-committee">Technical Committee:</h4>
 <p><a href="https://www.oasis-open.org/committees/amqp/">OASIS Advanced Message Queuing Protocol (AMQP) TC</a></p>
 <h4 id="chairs">Chairs:</h4>
@@ -227,7 +243,7 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <li><code>consumer group</code> is a named group of consumers that coordinate consumption of events across multiple partitions.</li>
 </ul>
 <h1 id="3-capabilities-and-default-behaviors">3 Capabilities and Default Behaviors</h1>
-<h2 id="31-connection-and-link-capabilities">3.1 Connection and Link Capabilities</h2>
+<h2 id="31-connection-capability">3.1 Connection Capability</h2>
 <p>On connection establishment, the event log node MUST indicate its support of this specification through the exchange of a connection capability (see Section 2.7.1, <a href="#amqp-v10">AMQP</a>). The capability allows for the consumer or producer to detect whether extensions as defined in this specification are understood and may be used.</p>
 <table>
 <thead>
@@ -239,22 +255,23 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <tbody>
 <tr class="odd">
 <td>AMQP_EVENT_STREAMS_V1_0</td>
-<td>If present in the offered-capabilities field of the open frame, the sender of the open supports the use of event streams extensions.</td>
+<td>If present in the offered-capabilities field of the open frame, the sender of the open supports the use of event streams. If present in the desired-capabilities field of the open frame, the sender of the open MUST use the event streams extensions if the receiver if the open offers this capability, and it MAY shut down the connection if the capability is not offered.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="32-default-behaviors">3.2 Default Behaviors</h2>
 <p>This specification does not modify or override any rules of the core AMQP 1.0 specification.</p>
-<p>Even with the capability being announced at the connection level, all additional behaviors defined here are optional, which means that a producer or consumer MUST be able to successfully interact with a conforming event log implementation just as with any regular AMQP node, for instance:</p>
+<p>Even with the capability being negotiated at the connection level, all additional behaviors defined in this specification are OPTIONAL, which means that a producer or consumer MUST be able to successfully interact with a conforming event log implementation just as with any regular AMQP node, for instance:</p>
 <ul>
-<li>Producers and consumers that do not choose a partition on a partitioned event log are either assigned a partition by the event log node, or their links are left partition-agnostic.</li>
+<li>Producers and consumers that do not choose a partition on a partitioned event log are either assigned a partition by the event log node, or their links are left to be <a href="#4-partition-support">partition-agnostic</a>.</li>
 <li>Producers are not required to annotate events with partition hints, even on partition-agnostic links. The event log node chooses the partition in absence of such hints.</li>
-<li>Consumers are not required to provide offset filter information. If no filter is provided, the consumer is eligible to receive events accepted by the event log node after the link was attached.</li>
-<li>Consumers can rely on all existing AMQP mechanisms for delivery-state tracking provided by the AMQP source terminus of the event log node. This means that after attaching a link, the consumer is not required to keep track of offsets for initiating further transfers while the link exists. The source might even offer link durability <a href="#amqp-v10">(AMQP 1.0, 3.5.5)</a> with full recovery of unsettled state in the case of disconnects.</li>
+<li>Consumers are not required to provide offset filter information. If no filter is provided, the consumer is eligible to receive events accepted by the event log node after the link was attached, equivalent to the <a href="#511-event-streams-offset">´latest' offset filter</a>.</li>
+<li>Consumers can rely on all existing AMQP mechanisms for delivery-state tracking provided by the AMQP source terminus of the event log node. This means that after attaching a link, the consumer is not required to keep track of offsets for initiating further transfers while the link exists. If the source offers link durability <a href="#amqp-v10">(AMQP 1.0, 3.5.5)</a>, the last offset is preserved by the durable terminus on the event log node side in the case of disconnects. The AMQP durable terminus model can indeed completely obviate the need for an external store to keep track of consumer offsets.</li>
 </ul>
 <h1 id="4-partition-support">4 Partition support</h1>
 <p>An event log maintains a sequence of events. An event log MAY be split into multiple parallel partitions that are reachable under the same network address, or the responsibility for maintaining an event log might also be shared across multiple AMQP containers/nodes that each have a separate network address and are each responsible for one or more partitions of the event log.</p>
-<p>Producers and consumers attach to the event log via AMQP links. Those links MAY be bound to one, specific partition (partition-bound) or they MAY be partition-agnostic. On partition-agnostic links, producers MAY provide transfer-level hints for which partition the transfer ought to be routed to.</p>
+<p>Producers and consumers attach to the event log via AMQP links. Those links MAY be bound to one specific partition (partition-bound), or they MAY be partition-agnostic. On partition-agnostic links, producers MAY provide transfer-level hints for which partition the transfer ought to be routed to.</p>
+<p>A partition-agnostic link will generally still be associated with one or multiple partitions on the side of the event log, but that association is dynamic.</p>
 <p>This model allows for a range of negotiation options for how consumers are affiliated with partitions:</p>
 <ul>
 <li>Producer and consumers choose partitions on their own</li>
@@ -262,13 +279,15 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <li>Producer and consumers are partition-agnostic and can send/receive from any partition</li>
 </ul>
 <p>The model composes with AMQP link-level redirects as defined in <a href="#amqp-v10">AMQP 1.0, 2.8.18</a>. With link-level redirects, the event log node MAY refuse to attach a link, but rather point to a different AMQP container where the requested or assigned partition is available.</p>
-<p>If the event log assigns partition-bound links to consumers and wants to renegotiate those assignments, it MAY gracefully close some or all attached links and the respective producer or consumer SHOULD then attempt to establish a new link.</p>
-<p>Whether the event log node assigns partition-bound or partition-agnostic links MAY be a configurable implementation choice. Partition-bound links provide the consumer with the assurance that all transfers belong to the given partition, which is desireable when the partitioning model extends into resources beyond the event log.</p>
-<p>The binding of a producer or consumer to a partition MAY be negotiated using link properties when the link is being attached. A consumer or producer MAY request for the link to be bound to a particular partition and the responding event log node MAY also bind the link to a partition if no binding has been requested. If the event log node is not willing grant the request for binding to a specific partition, it MUST detach the link.</p>
+<p>Partition-bound links provide the consumer with the assurance that all transfers belong to the given partition, which is desireable when the partitioning model extends into resources beyond the event log.</p>
+<p>The binding of a producer or consumer to a partition is negotiated using <a href="#461-event-streams-partition-link-property">the ´event-streams-partition´ link property</a> as the link is being attached.</p>
+<p>A consumer or producer MAY request for the link to be bound to a particular partition. If the event log node is not willing grant the request for binding to a specific partition, it MUST reject (attach and immediately detach) the link.</p>
+<p>The responding event log node MAY bind any link to a partition if no partition binding has been requested by the producer or consumer. Whether the event log node assigns partition-bound or partition-agnostic links MAY be a configurable implementation choice.</p>
+<p>If the event log chose to bind links to partitions for consumers who did not request a partition binding, and the event log wants to renegotiate those assignments, it MAY gracefully close some or all attached links. The respective consumer(s) SHOULD then attempt to establish a new link.</p>
 <p>Partition identifiers are opaque to consumers and producers and of type <code>symbol</code>. Consumers and producers learn about an event log node's available partitions and their identifiers using a <a href="#6-runtime-information">runtime information</a> request.</p>
 <h2 id="41-binding-producer-links">4.1 Binding producer links</h2>
 <p>A producer MAY request for the 'send' link to be bound to a specific partition using the <a href="#461-event-streams-partition-link-property"><code>event-streams-partition</code></a> link property.</p>
-<p>If the requested partition does not exist or if the event log node denies the request, attaching the link MUST be rejected by the event log node.</p>
+<p>If the requested partition does not exist or if the event log node denies the request, attaching the link MUST be rejected (attached and immediately detached) by the event log node.</p>
 <p>The event log node MAY bind the link a partition when none has been requested by the producer.</p>
 <p>If the link becomes partition-bound, the event log node MUST set the <a href="#461-event-streams-partition-link-property"><code>event-streams-partition</code></a> link property to the bound partition.</p>
 <h2 id="42-partition-annotations-in-producer-transfers">4.2 Partition annotations in producer transfers</h2>
@@ -283,18 +302,23 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <p>The <a href="#464-event-streams-source-partition-delivery-annotation"><code>event-streams-source-partition</code></a> delivery annotation MUST be added to all transfers to consumers made over partition-agnostic links.</p>
 <p>The annotation is OPTIONAL for transfers over partition-bound links, and if present, its value MUST be equal to the <code>event-streams-partition</code> link property value. Otherwise, the transfer MUST be rejected.</p>
 <h2 id="45-consumer-groups">4.5 Consumer groups</h2>
-<p>In scenarios where a group of multiple concurrent event consumers want to receive mutually exclusive subsets of events from a partitioned event log, it is desireable to restrict each partition to one (the "owning") receiver from the group, and for event consumers to shift ownership of the partition dynamically. Consumers might also want to use an external consensus mechanism to agree on which event processor owns which partition, rather than have the event log engine coordinate the assignments.</p>
+<p>In scenarios where a group of multiple concurrent event consumers want to receive mutually exclusive subsets of events from a partitioned event log, it is desireable to restrict each partition to one (the "owning") receiver from the group, and for event consumers to shift ownership of the partition dynamically.</p>
+<p>Consumers might also want to use an external consensus mechanism to agree on which event processor owns which partition, rather than have the event log engine coordinate the assignments.</p>
 <p>This specification does not prescribe any algorithm or strategy for reaching consensus on ownership of partitions amongst a group of consumers, but it provides mechanisms for realizing their outcomes.</p>
 <p>A consumer link MAY be bound to a consumer group by setting the <a href="#462-event-streams-consumer-group-link-property"><code>event-streams-consumer-group</code></a> link property to the name of the group during attach.</p>
-<p>The consumer group MAY be dynamically created during link attach or MAY require for there to be a such named pre-configured entity inside of event log node, in which case attaching the link MAY fail if such an entity does not exist.</p>
-<p>The event log node MUST NOT assign a consumer group if the consumer does not request such a binding. Links that are bound to consumer groups MUST also be bound to a partition; they cannot be partition-agnostic.</p>
+<p>The consumer group MAY be dynamically created during link attach or the event log node MAY require for there to be a such named pre-configured entity, in which case attaching the link MAY fail if such an entity does not exist.</p>
+<p>The event log node MUST NOT assign a consumer group on its own. Consumer group membership claims MUST be made by the consumer. Links that are bound to consumer groups MUST also be bound to a partition; they cannot be partition-agnostic.</p>
 <p>The selection and binding of a partition to the consumer within a given consumer group follows the negotiation model explained earlier in this section.</p>
 <p>If consumer groups are being used, the event log node MUST allow at most one active 'receive' link for each combination of partition and consumer group.</p>
 <h3 id="451-event-log-node-assigned-partition-ownership">4.5.1 Event log node-assigned partition ownership</h3>
 <p>If the consumer attaches a link scoped to a consumer group without specifying a partition, the event log node MAY bind a partition to the link as described in <a href="#43-binding-consumer-links">4.3</a>.</p>
-<p>If the event log node manages 10 partitions and there are 12 candidate consumers trying to establish links, 2 of those consumers might be denied access with a <code>detach-forced</code> error since there are no partitions left to assign. Once a partition-bound link closes, the respective partition is again available for assignment. If all partitions are assigned, the event log node MAY choose not to deny attaching the link outright, but keep further incoming attach requests pending and complete those only once a partition becomes available for assignment.</p>
-<p>If the event log node later wants to force renegotiation of partition bindings amongst a consumer group, it SHOULD gracefully close all partition-bound links and the respective consumers SHOULD attempt to establish a new link, again without specifying a partition.</p>
-<p>The event log node MAY also attach consumer group links without binding them to a specific partition, allowing for multiple partitions to be associated with a link and for those binding to change dynamically without having to reestablish the link.</p>
+<p>If the event log node manages, for instance, 10 partitions and there are 12 candidate consumers trying to establish links, one of two scenarios MAY apply:</p>
+<ol>
+<li>Two of those consumers MAY see their attach requests immediately rejected with a <code>detach-forced</code> error since there are no partitions left to assign.</li>
+<li>The event log node MAY instead choose not to deny attaching the link outright, but keep further incoming attach requests pending and complete those only once a partition becomes again available for assignment. Attach requests might therefore remain pending for a substantial time span, whose limits MAY be configurable in an implementation specific way.</li>
+</ol>
+<p>If the event log node wants to force renegotiation of partition bindings amongst a consumer group, it SHOULD gracefully close all partition-bound links and the respective consumers SHOULD attempt to establish a new link, again with indicating the consumer group, but without specifying a partition.</p>
+<p>The event log node MAY also attach consumer group links while leaving them partition-agnostics, allowing for multiple partitions to be associated with a link and for those bindings to change dynamically without having to reestablish the link. In this case, the event log SHOULD use the <a href="#464-event-streams-associated-partitions-changed-delivery-annotation"><code>event-streams-associated-partitions-changed</code></a> delivery annotation on the next transfer to notify the consumer of the new association.</p>
 <h3 id="452-consumer-negotiated-partition-ownership">4.5.2 Consumer-negotiated partition ownership</h3>
 <p>To allow consumers to negotiate partition ownership using an external consensus algorithm that does not establish transparent communication amongst the group of consumers, new assignments of consumers to partitions within the group need to be able to break the links of existing assignments.</p>
 <p>For instance, if the consensus algorithm for ownership of a partition were based on a expiring lease on some external object and a competing consumer were to acquire that lease upon expiration, the new owner ought to be able to promptly take ownership of the partition, without asking for the previous owner's explicit cooperation.</p>
@@ -317,6 +341,10 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <h4 id="464-event-streams-source-partition-delivery-annotation">4.6.4 event-streams-source-partition delivery annotation</h4>
 <p>The <code>event-streams-source-partition</code> delivery annotation is a <code>symbol</code> value and describes the partition from which partition the transfer originates.</p>
 <p>If the event log is partitioned, the delivery annotation MUST be added by the event log node before delivery to consumers.</p>
+<p>A consumer MUST strip the annotation if it forwards the message onwards.</p>
+<h4 id="464-event-streams-associated-partitions-changed-delivery-annotation">4.6.4 event-streams-associated-partitions-changed delivery annotation</h4>
+<p>The <code>event-streams-assigned-partitions-changed</code> delivery annotation is an array of <code>symbol</code> values and contains the list of partitions associated with the link that the transfer is being carried over.</p>
+<p>For all partition-agnostic consumer links, the event log node SHOULD add this annotation to the next transfer to the consumer once the association of partitions with the link has changed.</p>
 <p>A consumer MUST strip the annotation if it forwards the message onwards.</p>
 <h4 id="465-event-streams-target-partition-delivery-annotation">4.6.5 event-streams-target-partition delivery annotation</h4>
 <p>The <code>event-streams-target-partition</code> delivery annotation is a <code>symbol</code> value and describes the partition to which the transfer MUST be routed.</p>
@@ -352,9 +380,9 @@ Clemens Vasters (<a href="mailto:clemensv@microsoft.com">clemensv@microsoft.com<
 <p>The <code>event-streams-delivery-annotations</code> filter type applies to AMQP delivery annotations section (AMQP 3.2.2). The filter evaluates to true if all annotations enclosed in the filter expression match the respective delivery annotation map entries.</p>
 <p>Only the <a href="#511-event-streams-offset"><code>event-streams-offset</code></a> and/or <a href="#512-event-streams-timestamp"><code>event-streams-timestamp</code></a> delivery annotation properties are eligible to be used with this filter.</p>
 <p>The property values match the given values in the filter expression, if the value of the property is greater than value given in the filter expression. If the application remembered a particular offset after having consumed the message that carried it, the filter matches messages added after that offset.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode XML"><code class="sourceCode xml"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-delivery-annotations-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;amqp:map&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-delivery-annotations-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000200&quot;</span><span class="kw">/&gt;</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">&lt;/type&gt;</span> </a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode XML"><code class="sourceCode xml"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-delivery-annotations-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;amqp:map&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-delivery-annotations-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000200&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">&lt;/type&gt;</span> </span></code></pre></div>
 <p>The filter-type is “amqp:event-streams-delivery-annotations-filter”, with type-code 0x00000000:0x00000200</p>
 <h3 id="522-event-streams-sql-filter">5.2.2 event-streams-sql filter</h3>
 <p>The event streams SQL filter expression is a constrained subset of the SQL filter expression defined in <a href="#filtex-v10">AMQP filter expressions [FILTEX, 6]</a>.</p>
@@ -375,9 +403,9 @@ section ::= { ‘delivery_annotations’ | ‘d’ }
 <li>Start from event at offset "a4c5" inclusively: <code>d.event-streams-offset &gt;= 'a4c5'</code></li>
 <li>Start from event received after the timestamp: <code>d.event-streams-timestamp &gt; 1585672841</code></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode XML"><code class="sourceCode xml"><a class="sourceLine" id="cb3-1" title="1"> <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-sql-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;sql-filter&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-sql-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000201&quot;</span><span class="kw">/&gt;</span> </a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="kw">&lt;/type&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode XML"><code class="sourceCode xml"><span id="cb3-1"><a href="#cb3-1"></a> <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;event-streams-sql-filter&quot;</span><span class="ot"> class=</span><span class="st">&quot;restricted&quot;</span><span class="ot"> source=</span><span class="st">&quot;sql-filter&quot;</span><span class="ot"> provides=</span><span class="st">&quot;filter&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">&lt;descriptor</span><span class="ot"> name=</span><span class="st">&quot;amqp:event-streams-sql-filter&quot;</span><span class="ot"> code=</span><span class="st">&quot;0x00000000:0x00000201&quot;</span><span class="kw">/&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">&lt;/type&gt;</span></span></code></pre></div>
 <p>The filter-type is “amqp:event-streams-sql-filter”, with type-code 0x00000000:0x00000201</p>
 <hr />
 <h1 id="6-runtime-information">6 Runtime Information</h1>
@@ -415,10 +443,19 @@ section ::= { ‘delivery_annotations’ | ‘d’ }
 </table>
 <hr />
 <h1 id="7-safety-security-and-data-protection-considerations">7 Safety, Security, and Data Protection Considerations</h1>
-<p>[[TBD]]</p>
+<p>This specification builds on and extends the <a href="#amqp-v10">AMQP 1.0</a> specification and does not introduce any further safety, security, or data protection concerns.</p>
 <hr />
 <h1 id="8-conformance">8 Conformance</h1>
-<p>[[TBD]]</p>
+<p>When considering this specification, we can consider three distinct roles an AMQP container may play:</p>
+<p>Firstly, that of a producing container, which sends messages to an event log node. Secondly, that of a consuming container, which receives messages from an event log node. Thirdly, that of the event log container, which implements one or more event log nodes.</p>
+<p>For producing and consuming containers, there are no conformance constraints, because, as explained in the <a href="#32-default-behaviors">Default Behaviors</a> section, all behaviors defined herein are optional.</p>
+<p>Even though the behaviors are optional, there is a minimal set of features that MUST be implemented by an event log container to claim compliance with this specification:</p>
+<ol>
+<li>Offer the connection capability defined in <a href="#31-connection-capability">3.1 Connection Capability</a></li>
+<li>Implement the runtime information address defined in <a href="#6-runtime-information">6 Runtime Information</a></li>
+<li>Implement at least one of the offset filters defined in <a href="#52-delivery-filters">5 Delivery Filters</a></li>
+</ol>
+<p>Supporting partitions is not required for conformance.</p>
 <hr />
 <h1 id="appendix-a-acknowledgments">Appendix A. Acknowledgments</h1>
 <p>(Note: A Work Product approved by the TC must include a list of people who participated in the development of the Work Product. This is generally done by collecting the list of names in this appendix. This list shall be initially compiled by the Chair, and any Member of the TC may add or remove their names from the list by request.<br />
@@ -435,9 +472,24 @@ Remove this note before submitting for publication.)</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">TBD</td>
-<td style="text-align: left;">TBD</td>
-<td style="text-align: left;">TBD</td>
+<td style="text-align: left;">Paolo</td>
+<td style="text-align: left;">Patierno</td>
+<td style="text-align: left;">Red Hat</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jakub</td>
+<td style="text-align: left;">Scholz</td>
+<td style="text-align: left;">Red Hat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rob</td>
+<td style="text-align: left;">Godfrey</td>
+<td style="text-align: left;">Red Hat</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clemens</td>
+<td style="text-align: left;">Vasters</td>
+<td style="text-align: left;">Microsoft</td>
 </tr>
 </tbody>
 </table>
@@ -458,6 +510,12 @@ Remove this note before submitting for publication.)</p>
 <td style="text-align: left;">2020-06-22</td>
 <td style="text-align: left;">Clemens Vasters</td>
 <td style="text-align: left;">Initial working draft</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">event-streams-v1.0-wd02</td>
+<td style="text-align: left;">2020-10-01</td>
+<td style="text-align: left;">Clemens Vasters</td>
+<td style="text-align: left;">Addressed feedback and completed missing sections</td>
 </tr>
 </tbody>
 </table>
