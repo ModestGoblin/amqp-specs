@@ -553,8 +553,8 @@ of `symbol` values and contains the list of partitions associated with the link
 that the transfer is being carried over.
 
 For all partition-agnostic consumer links, the event log node SHOULD add this
-annotation to the next transfer to the consumer once the association of
-partitions with the link has changed.
+annotation to the next transfer to the consumer every time the association of
+partitions with the link changes.
 
 A consumer MUST strip the annotation if it forwards the message onwards.
 
