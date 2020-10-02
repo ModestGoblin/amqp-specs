@@ -1,4 +1,3 @@
-
 ![OASIS Logo](http://docs.oasis-open.org/templates/OASISLogo-v2.0.jpg)
 -------
 
@@ -136,47 +135,77 @@ servers, or containers supporting a peer-to-peer scenario.
 
 -------
 
-# 3 Definitions
+# 3 Connection Information
 
-An AMQP host that implements this specification MUST provide the following entry in the properties
-field of the AMQP `open` performative [[AMQP-v1.0](#AMQP-v1.0)]. The key of the entry MUST be the symbol
-`connection-info`. The value of the entry MUST be of type `fields`.
+## 3.1 Connection Capabilities
 
-The following key values have defined meaning. An implementation MAY choose to omit a key from the map.
-An implementation MAY also include keys of its own.
+An AMQP host that implements this specification MUST indicate this by including `conninfo` in the
+`offered-capabilities` field of the `open` performative [[AMQP-v1.0](#AMQP-v1.0)].  
+
+## 3.2 Connection Properties
+
+An AMQP host that implements this specification MUST include `connection-info` in the properties
+field of the AMQP `open` performative [[AMQP-v1.0](#AMQP-v1.0)]. The content of this property allows
+the container to provide information about itself and its operating environment to its partner.
+
+The key of the entry MUST be the symbol `connection-info`. The value of the entry MUST be of type `fields`.
+The XML notation for this type is:
+
+`<type name="connection-info" class="restricted" source="fields"/>`
+
+The key values described in the next sub-section below have defined meaning. An implementation MAY choose
+to omit a key from the map. An implementation MAY also include keys of its own.
 
 The receiving partner SHOULD NOT ascribe any semantics to a key not defined by this specification or its
 value, and the sender partner MUST NOT expect a receiver to ascribe any semantics to such a key.
 
-# 3.1 connection-info
-
-`<type name="connection-info" class="restricted" source="fields"/>`
-
-The content of `connection-info` allows the container to provide information about itself and its operating
-environment to its partner.
+# 3.2.1 connection-info
 
 **Table 1-1. connection-info**
 
-| Name | Description |
-| :--- | :--- |
-| `process-identifier` | The value of the process-identifier MUST be an AMQP string. The purpose of the value is to identify the process running this AMQP host. It is RECOMMENDED that this is an operating system PID. |
-| `network-host` | The value of network-host MUST be an AMQP string. The purpose of the value is to identify the host running the AMQP container in a way that assists those fault finding within a system. This value MAY be a hostname, fully qualified hostname or IP address. The value MAY be network resolvable by the AMQP peer but the peer MUST NOT rely on this. |
-| `amqp-product` | The value of amqp-product MUST be an AMQP string and is a `product-string`. It provides details of the software product(s) that provide the AMQP implementation. It MAY identify multiple products. By convention, the products are listed in order of their significance for identifying the product. |
-| `product` | The value of product MUST be an AMQP string and is a product-string. It provides details of the software product(s) that is the end-user application. It MAY identify multiple products. By convention, the products are listed in order of their significance for identifying the application. |
-| `platform` | The value of platform MUST be an AMQP string and is a product-string. It exists to expose details of a product’s runtime platform. This typically identify the operating system, Java/.NET runtimes etc. It MAY identify multiple products. By convention, the products are listed in order of their significance. |
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| `process-identifier` | AMQP string | The purpose of the value is to identify the process running this AMQP host. It is RECOMMENDED that this is an operating system PID. |
+| `network-host` | AMQP string | The purpose of the value is to identify the host running the AMQP container in a way that assists those fault finding within a system. This value MAY be a hostname, fully qualified hostname or IP address. The value MAY be network resolvable by the AMQP peer but the peer MUST NOT rely on this. |
+| `amqp-component` | `product-list` | The purpose of the value is to identify the sofware component(s) that provide the AMQP implementation.  Each element identities a single component. If the AMQP implementation is provided by a layered software stack, each layer MAY be identified separately. By convention, the components are listed in order of their significance. |
+| `application` | `product-list` | The purpose of the value is to identify the software application that make use of the AMQP implementation.  Each element identities a single component. If the application is implemented by a layered software stack, each layer MAY be identified separately. By convention, the components are listed in order of their significance. |
+| `platform` | `product-list` |  The purpose of the value is to describe the software application's runtime environment.  Each element identities a single aspect of the runtime environment, for instance operating system or Java/.NET runtime. By convention, the components are listed in order of their significance. |
 
-# 3.2 product-string
+# 3.2.1 product-list
 
-`<type name="product-string" class="restricted" source="string"/>`
+The XML notation for this type is:
 
-The content of the `product-string` MUST adopt the content structure of the `User-Agent` header (defined by 
-[[RFC7321](#rfc7321)]) and commonly implemented by Web Browsing software.
+`<type name="product-list" class="restricted" source="list"/>`
+
+The values of the `product-list` MUST be a `product`.
 
 ## Non normative examples:
 
+_Non-normative example illustrating a `product-list` describing a layer implementation. JSON notation used for illustrative purpose only._
+
 ```
-ApacheQpidJMS/0.36
-ApacheQpidJMS/0.36 ApacheQpidProton/0.45 (build 12345)
+[
+  "ApacheQpidJMS/0.36",
+  "ApacheQpidProton/0.45"
+]
+```
+
+
+# 3.2.2 product
+
+The XML notation for this type is:
+
+`<type name="product" class="restricted" source="string"/>`
+
+The content of the `product` MUST adopt the content structure of the `product` production rule
+defined by in section 5.5.3 of [[RFC7231](#rfc7321)].
+
+## Non normative examples:
+
+_Non-normative example illustrating a `product`._
+
+```
+ApacheQpidProton/0.45
 ```
 
 -------
