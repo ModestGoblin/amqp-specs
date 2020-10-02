@@ -462,7 +462,7 @@ candidate consumers trying to establish links, one of two scenarios MAY apply:
 If the event log node wants to force renegotiation of partition bindings amongst
 a consumer group, it SHOULD gracefully close all partition-bound links and the
 respective consumers SHOULD attempt to establish a new link, again with
-indicating the consumer group, but without specifying a partition.
+the consumer group, but without specifying a partition.
 
 The event log node MAY also attach consumer group links while leaving them
 partition-agnostics, allowing for multiple partitions to be associated with a
