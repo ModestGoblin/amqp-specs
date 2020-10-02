@@ -325,7 +325,7 @@ attach a link, but rather point to a different AMQP container where the
 requested or assigned partition is available.
 
 Partition-bound links provide the consumer with the assurance that all
-transfers belong to the given partition, which is desireable when the
+transfers belong to the given partition, which is desirable when the
 partitioning model extends into resources beyond the event log.
 
 The binding of a producer or consumer to a partition is negotiated using
@@ -824,4 +824,3 @@ specification and are gratefully acknowledged:
 | :---------------------- | :--------- | :-------------- | :-------------------- |
 | event-streams-v1.0-wd01 | 2020-06-22 | Clemens Vasters | Initial working draft |
 | event-streams-v1.0-wd02 | 2020-10-01 | Clemens Vasters | Addressed feedback and completed missing sections |
-
