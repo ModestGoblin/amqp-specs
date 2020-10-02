@@ -325,7 +325,7 @@ attach a link, but rather point to a different AMQP container where the
 requested or assigned partition is available.
 
 Partition-bound links provide the consumer with the assurance that all
-transfers belong to the given partition, which is desireable when the
+transfers belong to the given partition, which is desirable when the
 partitioning model extends into resources beyond the event log.
 
 The binding of a producer or consumer to a partition is negotiated using
@@ -462,7 +462,7 @@ candidate consumers trying to establish links, one of two scenarios MAY apply:
 If the event log node wants to force renegotiation of partition bindings amongst
 a consumer group, it SHOULD gracefully close all partition-bound links and the
 respective consumers SHOULD attempt to establish a new link, again with
-indicating the consumer group, but without specifying a partition.
+the consumer group, but without specifying a partition.
 
 The event log node MAY also attach consumer group links while leaving them
 partition-agnostics, allowing for multiple partitions to be associated with a
@@ -553,8 +553,8 @@ of `symbol` values and contains the list of partitions associated with the link
 that the transfer is being carried over.
 
 For all partition-agnostic consumer links, the event log node SHOULD add this
-annotation to the next transfer to the consumer once the association of
-partitions with the link has changed.
+annotation to the next transfer to the consumer every time the association of
+partitions with the link changes.
 
 A consumer MUST strip the annotation if it forwards the message onwards.
 
@@ -824,4 +824,3 @@ specification and are gratefully acknowledged:
 | :---------------------- | :--------- | :-------------- | :-------------------- |
 | event-streams-v1.0-wd01 | 2020-06-22 | Clemens Vasters | Initial working draft |
 | event-streams-v1.0-wd02 | 2020-10-01 | Clemens Vasters | Addressed feedback and completed missing sections |
-
